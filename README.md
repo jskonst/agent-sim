@@ -113,7 +113,7 @@ agent-sim/
 - **Phaser 3** — 2D движок
 - **Vite + TypeScript** — сборка
 - **A*** — pathfinding (собственная реализация, без библиотек)
-- **OpenRouter + GPT-4o-mini** — LLM (не подключено, планируется)
+- **OpenRouter + Gemini Flash Lite** — LLM (дёшево, ~$0.01/день)
 
 ## Разработка
 

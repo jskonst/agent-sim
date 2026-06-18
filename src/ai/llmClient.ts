@@ -25,7 +25,7 @@ class LLMClient {
 
   constructor() {
     this.config = {
-      model: 'openai/gpt-4o-mini',
+      model: 'google/gemini-2.0-flash-lite-preview-02-05',
       maxTokens: 200,
       temperature: 0.8,
     };
