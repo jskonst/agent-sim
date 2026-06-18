@@ -1,4 +1,5 @@
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const DEFAULT_MODEL = 'google/gemini-2.0-flash-lite-preview-02-05';
+const DEFAULT_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 export interface LLMMessage {
   role: 'system' | 'user' | 'assistant';
@@ -18,6 +19,7 @@ interface LLMConfig {
   model: string;
   maxTokens: number;
   temperature: number;
+  baseUrl: string;
 }
 
 class LLMClient {
@@ -25,13 +27,16 @@ class LLMClient {
 
   constructor() {
     this.config = {
-      model: 'google/gemini-2.0-flash-lite-preview-02-05',
+      model: DEFAULT_MODEL,
       maxTokens: 200,
       temperature: 0.8,
+      baseUrl: DEFAULT_URL,
     };
     try {
       const stored = localStorage.getItem('openrouter_api_key');
       if (stored) this.config.apiKey = stored;
+      const storedUrl = localStorage.getItem('llm_base_url');
+      if (storedUrl) this.config.baseUrl = storedUrl;
     } catch {}
   }
 
@@ -39,7 +44,7 @@ class LLMClient {
     if (!this.config.apiKey) return null;
 
     try {
-      const response = await fetch(OPENROUTER_URL, {
+      const response = await fetch(this.config.baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,6 +81,13 @@ class LLMClient {
     this.config.apiKey = key;
     try {
       localStorage.setItem('openrouter_api_key', key);
+    } catch {}
+  }
+
+  setBaseUrl(url: string): void {
+    this.config.baseUrl = url;
+    try {
+      localStorage.setItem('llm_base_url', url);
     } catch {}
   }
 
