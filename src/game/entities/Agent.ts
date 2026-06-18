@@ -2,14 +2,27 @@ import Phaser from 'phaser';
 import { AgentProfile, AVATAR_COLORS } from '../../data/agents';
 import { MovementSystem } from '../systems/MovementSystem';
 import { ScheduleSystem } from '../systems/ScheduleSystem';
+import { llmClient, LLMResponse } from '../../ai/llmClient';
+import { llmCache } from '../../ai/cache';
+import { rateLimiter } from '../../ai/rateLimiter';
+import { triggerSystem, TriggerResult } from '../../ai/triggers';
+import { buildSystemPrompt, buildInteractionPrompt } from '../../ai/prompts';
 
-interface AgentState {
+export interface AgentEvent {
+  description: string;
+  hour: number;
+}
+
+export interface AgentState {
   location: string;
   activity: string;
   mood: number;
   energy: number;
   targetX: number;
   targetY: number;
+  memory: AgentEvent[];
+  relationships: Record<string, number>;
+  thoughts: string;
 }
 
 export class Agent {
@@ -58,6 +71,9 @@ export class Agent {
       energy: 80,
       targetX: startTileX,
       targetY: startTileY,
+      memory: [],
+      relationships: { ...profile.relationships },
+      thoughts: '',
     };
 
     const color = AVATAR_COLORS[profile.avatar] || 0x48bb78;
@@ -84,7 +100,7 @@ export class Agent {
     this.highlightRing.setVisible(false);
   }
 
-  update(gameHour: number, agents: Agent[]): void {
+  update(gameHour: number, gameMinute: number, agents: Agent[], tick: number): void {
     const scheduleSystem = ScheduleSystem.getInstance();
     const movementSystem = MovementSystem.getInstance();
 
@@ -105,8 +121,109 @@ export class Agent {
     this.state.activity = schedule.activity;
     this.state.location = this.currentTargetZone;
 
+    this.processLLMTriggers(agents, tick, gameHour, gameMinute);
+
     this.updateStats();
     this.updateVisuals();
+  }
+
+  private async processLLMTriggers(agents: Agent[], tick: number, gameHour: number, gameMinute: number): Promise<void> {
+    const trigger = triggerSystem.shouldTrigger(this, agents, tick, gameHour, gameMinute);
+    if (!trigger) return;
+
+    if (!rateLimiter.canCall()) {
+      this.applyFallback(trigger);
+      return;
+    }
+
+    const cacheKey = llmCache.getKey(this.id, gameHour, this.state.location, this.state.activity);
+    const cached = llmCache.get(cacheKey);
+    if (cached) {
+      this.applyLLMResponse(cached);
+      return;
+    }
+
+    if (!llmClient.hasApiKey()) {
+      this.applyFallback(trigger);
+      return;
+    }
+
+    const prompt = this.buildPrompt(trigger, agents, gameHour);
+    const response = await llmClient.generate(prompt);
+
+    if (response) {
+      rateLimiter.recordCall();
+      llmCache.set(cacheKey, response);
+      this.applyLLMResponse(response);
+    } else {
+      this.applyFallback(trigger);
+    }
+  }
+
+  private buildPrompt(trigger: TriggerResult, agents: Agent[], gameHour: number): import('../../ai/llmClient').LLMMessage[] {
+    if (trigger.type === 'meeting') {
+      const other = trigger.data.otherAgent as Agent;
+      return buildInteractionPrompt(
+        this.profile,
+        this.state,
+        other.name,
+        other.profile.role,
+        this.state.location,
+        gameHour
+      );
+    }
+
+    return [
+      { role: 'system', content: buildSystemPrompt(this.profile, this.state, gameHour) },
+      { role: 'user', content: `Ситуация: ${trigger.type}. Что ты делаешь?` },
+    ];
+  }
+
+  private applyLLMResponse(response: LLMResponse): void {
+    if (response.action && response.action !== 'work') {
+      this.state.activity = response.action;
+    }
+
+    this.state.mood = Math.max(0, Math.min(100, this.state.mood + response.moodChange));
+
+    for (const [agentId, delta] of Object.entries(response.relationshipChanges)) {
+      if (this.state.relationships[agentId] !== undefined) {
+        this.state.relationships[agentId] = Math.max(-100, Math.min(100, this.state.relationships[agentId] + delta));
+      }
+    }
+
+    if (response.thoughts) {
+      this.state.thoughts = response.thoughts;
+    }
+
+    this.state.memory.push({
+      description: response.dialogue?.text || response.thoughts,
+      hour: 0,
+    });
+    if (this.state.memory.length > 10) {
+      this.state.memory.shift();
+    }
+  }
+
+  private applyFallback(trigger: TriggerResult): void {
+    if (trigger.type === 'meeting') {
+      if (Math.random() < 0.3) {
+        this.state.activity = 'socialize';
+        this.state.thoughts = 'Надо поздороваться';
+      }
+    } else if (trigger.type === 'crisis') {
+      if (this.state.energy < 20) {
+        this.state.activity = 'eat';
+      } else {
+        this.state.activity = 'rest';
+      }
+      this.state.thoughts = 'Нужно восстановить силы';
+    }
+
+    const energyDrain = this.state.activity === 'work' ? -1 : 0;
+    const moodBoost = this.state.activity === 'socialize' ? 2 : 0;
+    this.state.energy = Math.max(0, Math.min(100, this.state.energy + energyDrain));
+    this.state.mood = Math.max(0, Math.min(100, this.state.mood + moodBoost));
   }
 
   private moveAlongPath(): void {

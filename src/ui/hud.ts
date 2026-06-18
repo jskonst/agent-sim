@@ -1,10 +1,12 @@
 import Phaser from 'phaser';
+import { llmClient } from '../ai/llmClient';
 
 export class HUD {
   private scene: Phaser.Scene;
   private timeText: Phaser.GameObjects.Text;
   private locationText: Phaser.GameObjects.Text;
   private agentsText: Phaser.GameObjects.Text;
+  private apiKeyText: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -29,6 +31,25 @@ export class HUD {
       backgroundColor: '#00000088',
       padding: { x: 8, y: 4 }
     }).setScrollFactor(0).setDepth(100);
+
+    const apiKeyLabel = llmClient.hasApiKey() ? 'API Key: ✓' : '[Set OpenRouter API Key]';
+    const apiKeyColor = llmClient.hasApiKey() ? '#48bb78' : '#ecc94b';
+
+    this.apiKeyText = scene.add.text(16, 130, apiKeyLabel, {
+      fontSize: '12px',
+      color: apiKeyColor,
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(100).setInteractive();
+
+    this.apiKeyText.on('pointerdown', () => {
+      const key = prompt('Enter OpenRouter API key:');
+      if (key) {
+        llmClient.setApiKey(key);
+        this.apiKeyText.setText('API Key: ✓');
+        this.apiKeyText.setColor('#48bb78');
+      }
+    });
   }
 
   update(currentZone: string) {

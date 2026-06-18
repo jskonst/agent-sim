@@ -89,7 +89,7 @@ export class GameScene extends Phaser.Scene {
     this.agents.forEach((agent) => {
       const prevZone = agent.state.location;
       const prevActivity = agent.state.activity;
-      agent.update(this.gameHour, this.agents);
+      agent.update(this.gameHour, this.gameMinute, this.agents, Math.floor(this.tickAccumulator / this.TICK_INTERVAL));
 
       const zoneChange = agent.getZoneChange();
       if (zoneChange && zoneChange !== prevZone) {
