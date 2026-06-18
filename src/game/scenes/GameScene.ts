@@ -70,6 +70,12 @@ export class GameScene extends Phaser.Scene {
 
     MovementSystem.getInstance();
     this.createAgents();
+    this.hud.setAgents(this.agents);
+
+    // Save agent state when page closes
+    window.addEventListener('beforeunload', () => {
+      this.agents.forEach(a => a.persistNow());
+    });
 
     this.setupObservation();
     this.setupClickHandler();

@@ -46,6 +46,8 @@ export class Agent {
   private previousZone: string = '';
   private previousActivity: string = '';
   private highlightRing: Phaser.GameObjects.Arc;
+  private readonly STORAGE_KEY: string;
+  private saveTimer: number = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -63,6 +65,7 @@ export class Agent {
     this.path = [];
     this.pathIndex = 0;
     this.currentTargetZone = '';
+    this.STORAGE_KEY = `agent_sim_agent_${this.id}`;
 
     this.state = {
       location: 'corridor',
@@ -75,6 +78,8 @@ export class Agent {
       relationships: { ...profile.relationships },
       thoughts: '',
     };
+
+    this.loadState();
 
     const color = AVATAR_COLORS[profile.avatar] || 0x48bb78;
     const pixelX = startTileX * this.TILE_SIZE + this.TARGET_OFFSET;
@@ -203,6 +208,8 @@ export class Agent {
     if (this.state.memory.length > 10) {
       this.state.memory.shift();
     }
+
+    this.saveState();
   }
 
   private applyFallback(trigger: TriggerResult): void {
@@ -309,6 +316,60 @@ export class Agent {
 
     this.state.energy = Math.max(0, Math.min(100, this.state.energy + energyDrain));
     this.state.mood = Math.max(0, Math.min(100, this.state.mood + moodChange));
+
+    this.saveTimer++;
+    if (this.saveTimer % 60 === 0) {
+      this.saveState();
+    }
+  }
+
+  private loadState(): void {
+    const raw = localStorage.getItem(this.STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      if (data.memory) this.state.memory = data.memory;
+      if (data.relationships) this.state.relationships = data.relationships;
+      if (data.mood != null) this.state.mood = data.mood;
+      if (data.energy != null) this.state.energy = data.energy;
+      if (data.thoughts) this.state.thoughts = data.thoughts;
+    } catch {
+      // corrupted data — start fresh
+    }
+  }
+
+  private saveState(): void {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify({
+      memory: this.state.memory,
+      relationships: this.state.relationships,
+      mood: this.state.mood,
+      energy: this.state.energy,
+      thoughts: this.state.thoughts,
+    }));
+  }
+
+  /** Immediately persist state to localStorage */
+  persistNow(): void {
+    this.saveState();
+  }
+
+  /** Resets persisted state — call on manual restart */
+  resetState(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
+    this.state.memory = [];
+    this.state.relationships = { ...this.profile.relationships };
+    this.state.mood = 70;
+    this.state.energy = 80;
+    this.state.thoughts = '';
+  }
+
+  static clearAllState(): void {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('agent_sim_agent_')) {
+        localStorage.removeItem(key);
+      }
+    }
   }
 
   private updateVisuals(): void {
@@ -344,4 +405,33 @@ export class Agent {
       this.sprite.setStrokeStyle(1, 0xffffff);
     }
   }
+
+  /** Export agent state for file save */
+  getPersistData(): AgentPersistData {
+    return {
+      memory: this.state.memory,
+      relationships: this.state.relationships,
+      mood: this.state.mood,
+      energy: this.state.energy,
+      thoughts: this.state.thoughts,
+    };
+  }
+
+  /** Restore agent state from imported file data */
+  restoreFromData(data: AgentPersistData): void {
+    this.state.memory = data.memory || [];
+    this.state.relationships = data.relationships || { ...this.profile.relationships };
+    this.state.mood = data.mood ?? 70;
+    this.state.energy = data.energy ?? 80;
+    this.state.thoughts = data.thoughts || '';
+    this.saveState();
+  }
+}
+
+export interface AgentPersistData {
+  memory: AgentEvent[];
+  relationships: Record<string, number>;
+  mood: number;
+  energy: number;
+  thoughts: string;
 }

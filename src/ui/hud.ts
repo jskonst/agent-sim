@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { llmClient } from '../ai/llmClient';
+import { Agent, AgentPersistData } from '../game/entities/Agent';
 
 export class HUD {
   private scene: Phaser.Scene;
@@ -8,6 +9,9 @@ export class HUD {
   private agentsText: Phaser.GameObjects.Text;
   private apiKeyText: Phaser.GameObjects.Text;
   private urlText: Phaser.GameObjects.Text;
+  private exportText: Phaser.GameObjects.Text;
+  private importText: Phaser.GameObjects.Text;
+  private agents: Agent[] = [];
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -67,6 +71,30 @@ export class HUD {
         this.urlText.setText(`[URL: ${extractHost(url)}]`);
       }
     });
+
+    // ── Export button ──
+    this.exportText = scene.add.text(16, 175, '[Export State]', {
+      fontSize: '12px',
+      color: '#48bb78',
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(100).setInteractive();
+
+    this.exportText.on('pointerdown', () => this.exportToFile());
+
+    // ── Import button ──
+    this.importText = scene.add.text(16, 195, '[Import State]', {
+      fontSize: '12px',
+      color: '#ecc94b',
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(100).setInteractive();
+
+    this.importText.on('pointerdown', () => this.importFromFile());
+  }
+
+  setAgents(agents: Agent[]): void {
+    this.agents = agents;
   }
 
   update(currentZone: string) {
@@ -95,6 +123,71 @@ export class HUD {
   updateAgentCount(count: number) {
     this.agentsText.setText(`Agents: ${count}`);
   }
+
+  // ── Privates ──
+
+  private exportToFile(): void {
+    if (this.agents.length === 0) return;
+
+    const data: Record<string, AgentPersistData> = {};
+    for (const agent of this.agents) {
+      data[agent.id] = agent.getPersistData();
+    }
+
+    const payload = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      agents: data,
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `agent-sim-state-${formatDate()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  private importFromFile(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result as string);
+          const agentsData = parsed.agents as Record<string, AgentPersistData>;
+          if (!agentsData) {
+            alert('Invalid file format: "agents" key not found');
+            return;
+          }
+
+          let restored = 0;
+          for (const agent of this.agents) {
+            if (agentsData[agent.id]) {
+              agent.restoreFromData(agentsData[agent.id]);
+              restored++;
+            }
+          }
+
+          alert(`Imported state for ${restored} agents`);
+        } catch {
+          alert('Failed to parse file');
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    input.click();
+  }
 }
 
 function extractHost(url: string): string {
@@ -104,4 +197,14 @@ function extractHost(url: string): string {
   } catch {
     return url.length > 25 ? url.slice(0, 25) + '…' : url;
   }
+}
+
+function formatDate(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  const h = d.getHours().toString().padStart(2, '0');
+  const min = d.getMinutes().toString().padStart(2, '0');
+  return `${y}-${m}-${day}_${h}-${min}`;
 }
