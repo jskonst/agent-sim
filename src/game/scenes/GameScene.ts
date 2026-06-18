@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
 import { HUD } from '../../ui/hud';
+import { AgentPanel } from '../../ui/agentPanel';
+import { EventLog } from '../../ui/eventLog';
+import { StatsPanel } from '../../ui/statsPanel';
 import { Agent } from '../entities/Agent';
 import { AGENTS } from '../../data/agents';
 import { MovementSystem } from '../systems/MovementSystem';
@@ -36,6 +39,9 @@ export class GameScene extends Phaser.Scene {
   private wasd!: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key };
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private hud!: HUD;
+  private agentPanel!: AgentPanel;
+  private eventLog!: EventLog;
+  private statsPanel!: StatsPanel;
   private currentZone: string = 'reception';
   private zoneTexts: Phaser.GameObjects.Text[] = [];
   private agents: Agent[] = [];
@@ -44,6 +50,7 @@ export class GameScene extends Phaser.Scene {
   private tickAccumulator: number = 0;
   private readonly TICK_INTERVAL: number = 1000;
   private readonly GAME_MINUTES_PER_TICK: number = 5;
+  private observedAgentIndex: number = -1;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -55,11 +62,17 @@ export class GameScene extends Phaser.Scene {
     this.createWalls();
     this.setupCamera();
     this.hud = new HUD(this);
+    this.agentPanel = new AgentPanel(this);
+    this.eventLog = new EventLog(this);
+    this.statsPanel = new StatsPanel(this);
     this.setupInput();
     this.physics.add.collider(this.player, this.walls);
 
     MovementSystem.getInstance();
     this.createAgents();
+
+    this.setupObservation();
+    this.setupClickHandler();
   }
 
   update(time: number, delta: number) {
@@ -73,7 +86,38 @@ export class GameScene extends Phaser.Scene {
       this.advanceTime();
     }
 
-    this.agents.forEach((agent) => agent.update(this.gameHour, this.agents));
+    this.agents.forEach((agent) => {
+      const prevZone = agent.state.location;
+      const prevActivity = agent.state.activity;
+      agent.update(this.gameHour, this.agents);
+
+      const zoneChange = agent.getZoneChange();
+      if (zoneChange && zoneChange !== prevZone) {
+        const zoneLabels: Record<string, string> = {
+          reception: 'Reception', open_space_1: 'Open Space 1', open_space_2: 'Open Space 2',
+          meeting_1: 'Meeting Room 1', meeting_2: 'Meeting Room 2', kitchen: 'Kitchen',
+          office_cow: 'Office Coworking', wc_m: 'WC Men', wc_f: 'WC Women', corridor: 'Corridor',
+        };
+        this.eventLog.addEntry(`${agent.name} → ${zoneLabels[zoneChange] || zoneChange}`, '#4ecdc4', this.gameHour * 60 + this.gameMinute);
+      }
+
+      const actChange = agent.getActivityChange();
+      if (actChange && actChange !== prevActivity && actChange !== 'moving') {
+        const actLabels: Record<string, string> = {
+          work: 'начал работать', meeting: 'идёт на встречу', eat: 'пошёл есть',
+          socialize: 'общается', rest: 'отдыхает', idle: 'бездействует',
+        };
+        if (actLabels[actChange]) {
+          this.eventLog.addEntry(`${agent.name} ${actLabels[actChange]}`, '#48bb78', this.gameHour * 60 + this.gameMinute);
+        }
+      }
+    });
+
+    this.statsPanel.update(this.agents);
+
+    if (this.observedAgentIndex >= 0 && this.observedAgentIndex < this.agents.length) {
+      this.agentPanel.update(this.agents[this.observedAgentIndex]);
+    }
   }
 
   private createAgents() {
@@ -214,6 +258,57 @@ export class GameScene extends Phaser.Scene {
       S: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
       D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
+  }
+
+  private setupObservation() {
+    if (!this.input.keyboard) return;
+
+    this.input.keyboard.on('keydown-TAB', () => {
+      if (this.agents.length === 0) return;
+
+      if (this.observedAgentIndex >= 0 && this.observedAgentIndex < this.agents.length) {
+        this.agents[this.observedAgentIndex].setHighlighted(false);
+      }
+
+      this.observedAgentIndex = (this.observedAgentIndex + 1) % this.agents.length;
+      const agent = this.agents[this.observedAgentIndex];
+      this.cameras.main.startFollow(agent.sprite, true, 0.08, 0.08);
+      this.agentPanel.show(agent);
+      agent.setHighlighted(true);
+    });
+
+    this.input.keyboard.on('keydown-ESC', () => {
+      if (this.observedAgentIndex >= 0 && this.observedAgentIndex < this.agents.length) {
+        this.agents[this.observedAgentIndex].setHighlighted(false);
+      }
+      this.observedAgentIndex = -1;
+      this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+      this.agentPanel.hide();
+    });
+  }
+
+  private setupClickHandler() {
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      const clickedAgent = this.agents.find(a => {
+        const dist = Phaser.Math.Distance.Between(pointer.x, pointer.y, a.sprite.x, a.sprite.y);
+        return dist < 20;
+      });
+
+      if (this.observedAgentIndex >= 0 && this.observedAgentIndex < this.agents.length) {
+        this.agents[this.observedAgentIndex].setHighlighted(false);
+      }
+
+      if (clickedAgent) {
+        this.observedAgentIndex = this.agents.indexOf(clickedAgent);
+        this.cameras.main.startFollow(clickedAgent.sprite, true, 0.08, 0.08);
+        this.agentPanel.show(clickedAgent);
+        clickedAgent.setHighlighted(true);
+      } else {
+        this.observedAgentIndex = -1;
+        this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+        this.agentPanel.hide();
+      }
+    });
   }
 
   private handleMovement() {

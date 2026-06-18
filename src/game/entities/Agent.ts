@@ -30,6 +30,9 @@ export class Agent {
   private readonly MOVEMENT_SPEED = 2;
   private currentTargetZone: string;
   private readonly TARGET_OFFSET = 16;
+  private previousZone: string = '';
+  private previousActivity: string = '';
+  private highlightRing: Phaser.GameObjects.Arc;
 
   constructor(
     scene: Phaser.Scene,
@@ -62,6 +65,7 @@ export class Agent {
     const pixelY = startTileY * this.TILE_SIZE + this.TARGET_OFFSET;
 
     this.sprite = scene.add.circle(pixelX, pixelY, 10, color);
+    this.sprite.setStrokeStyle(1, 0xffffff);
     this.sprite.setDepth(10);
 
     this.nameLabel = scene.add.text(pixelX, pixelY - 16, profile.name, {
@@ -72,6 +76,12 @@ export class Agent {
     });
     this.nameLabel.setOrigin(0.5);
     this.nameLabel.setDepth(11);
+
+    this.highlightRing = scene.add.circle(pixelX, pixelY, 14);
+    this.highlightRing.setFillStyle(0x000000, 0);
+    this.highlightRing.setStrokeStyle(3, 0x4ecdc4);
+    this.highlightRing.setDepth(12);
+    this.highlightRing.setVisible(false);
   }
 
   update(gameHour: number, agents: Agent[]): void {
@@ -189,5 +199,32 @@ export class Agent {
     this.sprite.y = this.tileY * this.TILE_SIZE + this.TARGET_OFFSET;
     this.nameLabel.x = this.sprite.x;
     this.nameLabel.y = this.sprite.y - 16;
+    this.highlightRing.x = this.sprite.x;
+    this.highlightRing.y = this.sprite.y;
+  }
+
+  getZoneChange(): string | null {
+    if (this.state.location !== this.previousZone) {
+      this.previousZone = this.state.location;
+      return this.state.location;
+    }
+    return null;
+  }
+
+  getActivityChange(): string | null {
+    if (this.state.activity !== this.previousActivity) {
+      this.previousActivity = this.state.activity;
+      return this.state.activity;
+    }
+    return null;
+  }
+
+  setHighlighted(highlighted: boolean): void {
+    this.highlightRing.setVisible(highlighted);
+    if (highlighted) {
+      this.sprite.setStrokeStyle(3, 0x4ecdc4);
+    } else {
+      this.sprite.setStrokeStyle(1, 0xffffff);
+    }
   }
 }
