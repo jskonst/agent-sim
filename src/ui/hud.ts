@@ -7,6 +7,7 @@ export class HUD {
   private locationText: Phaser.GameObjects.Text;
   private agentsText: Phaser.GameObjects.Text;
   private apiKeyText: Phaser.GameObjects.Text;
+  private urlText: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -50,6 +51,22 @@ export class HUD {
         this.apiKeyText.setColor('#48bb78');
       }
     });
+
+    const urlHost = extractHost(llmClient.getBaseUrl());
+    this.urlText = scene.add.text(16, 150, `[URL: ${urlHost}]`, {
+      fontSize: '12px',
+      color: '#4ecdc4',
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(100).setInteractive();
+
+    this.urlText.on('pointerdown', () => {
+      const url = prompt('Enter LLM API base URL:', llmClient.getBaseUrl());
+      if (url) {
+        llmClient.setBaseUrl(url);
+        this.urlText.setText(`[URL: ${extractHost(url)}]`);
+      }
+    });
   }
 
   update(currentZone: string) {
@@ -77,5 +94,14 @@ export class HUD {
 
   updateAgentCount(count: number) {
     this.agentsText.setText(`Agents: ${count}`);
+  }
+}
+
+function extractHost(url: string): string {
+  try {
+    const u = new URL(url);
+    return u.hostname;
+  } catch {
+    return url.length > 25 ? url.slice(0, 25) + '…' : url;
   }
 }

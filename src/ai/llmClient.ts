@@ -84,6 +84,10 @@ class LLMClient {
     } catch {}
   }
 
+  getBaseUrl(): string {
+    return this.config.baseUrl;
+  }
+
   setBaseUrl(url: string): void {
     this.config.baseUrl = url;
     try {
