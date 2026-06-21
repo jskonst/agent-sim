@@ -4,12 +4,12 @@ import { AgentPanel } from '../../ui/agentPanel';
 import { EventLog } from '../../ui/eventLog';
 import { StatsPanel } from '../../ui/statsPanel';
 import { Agent } from '../entities/Agent';
-import { AGENTS } from '../../data/agents';
+import { MEDIEVAL_AGENTS } from '../../data/medieval_agents';
+import { MODERN_AGENTS } from '../../data/modern_agents';
+import { SCIFI_AGENTS } from '../../data/scifi_agents';
 import { MovementSystem } from '../systems/MovementSystem';
 
 const TILE_SIZE = 32;
-const MAP_WIDTH = 22;
-const MAP_HEIGHT = 22;
 
 interface ZoneConfig {
   id: string;
@@ -21,16 +21,43 @@ interface ZoneConfig {
   color: number;
 }
 
-const ZONES: ZoneConfig[] = [
-  { id: 'reception', name: 'Reception', x: 0, y: 0, width: 6, height: 6, color: 0x2d3748 },
-  { id: 'open_space_1', name: 'Open Space 1', x: 7, y: 0, width: 7, height: 6, color: 0x2c5282 },
-  { id: 'open_space_2', name: 'Open Space 2', x: 15, y: 0, width: 7, height: 6, color: 0x2b6cb0 },
-  { id: 'meeting_1', name: 'Meeting Room 1', x: 0, y: 7, width: 6, height: 4, color: 0x553c9a },
-  { id: 'meeting_2', name: 'Meeting Room 2', x: 15, y: 7, width: 7, height: 4, color: 0x6b46c1 },
-  { id: 'kitchen', name: 'Kitchen', x: 0, y: 12, width: 6, height: 5, color: 0x276749 },
-  { id: 'office_cow', name: 'Office Coworking', x: 15, y: 12, width: 7, height: 5, color: 0x2f855a },
-  { id: 'wc_m', name: 'WC Men', x: 0, y: 18, width: 6, height: 4, color: 0x744210 },
-  { id: 'wc_f', name: 'WC Women', x: 15, y: 18, width: 7, height: 4, color: 0x975a16 },
+const MEDIEVAL_ZONES: ZoneConfig[] = [
+  { id: 'town_hall', name: 'Ратуша', x: 1, y: 1, width: 6, height: 4, color: 0x2d3748 },
+  { id: 'market', name: 'Рынок', x: 8, y: 1, width: 5, height: 4, color: 0x2c5282 },
+  { id: 'tavern', name: 'Таверна', x: 15, y: 1, width: 4, height: 4, color: 0x975a16 },
+  { id: 'blacksmith', name: 'Кузница', x: 1, y: 7, width: 6, height: 3, color: 0x744210 },
+  { id: 'temple', name: 'Храм', x: 8, y: 7, width: 5, height: 3, color: 0x553c9a },
+  { id: 'farm', name: 'Ферма', x: 15, y: 7, width: 4, height: 3, color: 0x276749 },
+  { id: 'house_1', name: 'Дом 1', x: 1, y: 13, width: 6, height: 3, color: 0x2f855a },
+  { id: 'house_2', name: 'Дом 2', x: 8, y: 13, width: 5, height: 3, color: 0x2b6cb0 },
+  { id: 'fountain', name: 'Фонтан', x: 15, y: 13, width: 4, height: 3, color: 0x4299e1 },
+  { id: 'castle_gate', name: 'Ворота замка', x: 1, y: 19, width: 18, height: 3, color: 0x6b46c1 }
+];
+
+const MODERN_ZONES: ZoneConfig[] = [
+  { id: 'city_hall', name: 'Мэрия', x: 1, y: 1, width: 6, height: 4, color: 0x2d3748 },
+  { id: 'supermarket', name: 'Супермаркет', x: 8, y: 1, width: 5, height: 4, color: 0x2c5282 },
+  { id: 'cafe', name: 'Кафе', x: 15, y: 1, width: 4, height: 4, color: 0x975a16 },
+  { id: 'auto_repair', name: 'Автосервис', x: 1, y: 7, width: 6, height: 3, color: 0x744210 },
+  { id: 'park', name: 'Парк', x: 8, y: 7, width: 5, height: 3, color: 0x276749 },
+  { id: 'school', name: 'Школа', x: 15, y: 7, width: 4, height: 3, color: 0x553c9a },
+  { id: 'house_1', name: 'Дом 1', x: 1, y: 13, width: 6, height: 3, color: 0x2f855a },
+  { id: 'house_2', name: 'Дом 2', x: 8, y: 13, width: 5, height: 3, color: 0x2b6cb0 },
+  { id: 'bus_stop', name: 'Автобусная остановка', x: 15, y: 13, width: 4, height: 3, color: 0x4299e1 },
+  { id: 'community_center', name: 'Общественный центр', x: 1, y: 19, width: 18, height: 3, color: 0x6b46c1 }
+];
+
+const SCIFI_ZONES: ZoneConfig[] = [
+  { id: 'command_center', name: 'Командный центр', x: 1, y: 1, width: 6, height: 4, color: 0x2d3748 },
+  { id: 'medbay', name: 'Медбей', x: 8, y: 1, width: 5, height: 4, color: 0x2c5282 },
+  { id: 'bar', name: 'Бар', x: 15, y: 1, width: 4, height: 4, color: 0x975a16 },
+  { id: 'cargo_dock', name: 'Грузовой док', x: 1, y: 7, width: 6, height: 3, color: 0x744210 },
+  { id: 'research_lab', name: 'Исследования', x: 8, y: 7, width: 5, height: 3, color: 0x553c9a },
+  { id: 'living_quarters_1', name: 'Жилой модуль 1', x: 15, y: 7, width: 4, height: 3, color: 0x2f855a },
+  { id: 'living_quarters_2', name: 'Жилой модуль 2', x: 1, y: 13, width: 6, height: 3, color: 0x2b6cb0 },
+  { id: 'corridors', name: 'Коридоры', x: 8, y: 13, width: 5, height: 3, color: 0x4299e1 },
+  { id: 'hangar', name: 'Ангар', x: 15, y: 13, width: 4, height: 3, color: 0x6b46c1 },
+  { id: 'security_station', name: 'Служба безопасности', x: 1, y: 19, width: 18, height: 3, color: 0xe53e3e }
 ];
 
 export class GameScene extends Phaser.Scene {
@@ -42,7 +69,7 @@ export class GameScene extends Phaser.Scene {
   private agentPanel!: AgentPanel;
   private eventLog!: EventLog;
   private statsPanel!: StatsPanel;
-  private currentZone: string = 'reception';
+  private currentZone: string = 'town_hall';
   private zoneTexts: Phaser.GameObjects.Text[] = [];
   private agents: Agent[] = [];
   private gameHour: number = 8;
@@ -51,12 +78,28 @@ export class GameScene extends Phaser.Scene {
   private readonly TICK_INTERVAL: number = 1000;
   private readonly GAME_MINUTES_PER_TICK: number = 5;
   private observedAgentIndex: number = -1;
+  private scenario: string = 'medieval';
+  private zones: ZoneConfig[] = [];
 
   constructor() {
     super({ key: 'GameScene' });
   }
 
   create() {
+    const selectedScenario = this.registry.get('selectedScenario') as any;
+    const customConfig = this.registry.get('customConfig') as any;
+
+    if (customConfig) {
+      this.scenario = 'custom';
+      this.loadCustomConfig(customConfig);
+    } else if (selectedScenario) {
+      this.scenario = selectedScenario.scenario;
+      this.loadScenario(selectedScenario);
+    } else {
+      this.scenario = 'medieval';
+      this.loadDefaultMedieval();
+    }
+
     this.drawMap();
     this.createPlayer();
     this.createWalls();
@@ -72,7 +115,6 @@ export class GameScene extends Phaser.Scene {
     this.createAgents();
     this.hud.setAgents(this.agents);
 
-    // Save agent state when page closes
     window.addEventListener('beforeunload', () => {
       this.agents.forEach(a => a.persistNow());
     });
@@ -81,10 +123,249 @@ export class GameScene extends Phaser.Scene {
     this.setupClickHandler();
   }
 
+  private loadScenario(selectedScenario: any) {
+    switch (selectedScenario.scenario) {
+      case 'medieval':
+        this.gameHour = selectedScenario.time.startHour;
+        this.zones = MEDIEVAL_ZONES;
+        this.currentZone = 'town_hall';
+        break;
+      case 'modern':
+        this.gameHour = selectedScenario.time.startHour;
+        this.zones = MODERN_ZONES;
+        this.currentZone = 'city_hall';
+        break;
+      case 'scifi':
+        this.gameHour = selectedScenario.time.startHour;
+        this.zones = SCIFI_ZONES;
+        this.currentZone = 'command_center';
+        break;
+    }
+  }
+
+  private loadDefaultMedieval() {
+    this.gameHour = 8;
+    this.zones = MEDIEVAL_ZONES;
+    this.currentZone = 'town_hall';
+  }
+
+  private loadCustomConfig(config: any) {
+    this.gameHour = config.time.startHour;
+    this.zones = config.locations.map((loc: any) => ({
+      id: loc.id,
+      name: loc.name,
+      x: loc.x,
+      y: loc.y,
+      width: loc.width,
+      height: loc.height,
+      color: 0x2d3748
+    }));
+    this.currentZone = config.locations[0]?.id || 'default';
+  }
+
+  drawMap() {
+    const MAP_WIDTH = this.zones.reduce((max, zone) => Math.max(max, zone.x + zone.width), 20) * TILE_SIZE;
+    const MAP_HEIGHT = this.zones.reduce((max, zone) => Math.max(max, zone.y + zone.height), 22) * TILE_SIZE;
+
+    this.add.rectangle(MAP_WIDTH / 2, MAP_HEIGHT / 2, MAP_WIDTH, MAP_HEIGHT, 0x1a1a2e);
+
+    this.zones.forEach(zone => {
+      const centerX = zone.x * TILE_SIZE + (zone.width * TILE_SIZE) / 2;
+      const centerY = zone.y * TILE_SIZE + (zone.height * TILE_SIZE) / 2;
+
+      this.add.rectangle(
+        centerX,
+        centerY,
+        zone.width * TILE_SIZE - 4,
+        zone.height * TILE_SIZE - 4,
+        zone.color,
+        0.3
+      ).setStrokeStyle(2, zone.color);
+
+      const zoneText = this.add.text(centerX, centerY, zone.name, {
+        fontSize: '14px',
+        color: '#ffffff',
+        backgroundColor: '#00000066',
+        padding: { x: 4, y: 2 }
+      }).setOrigin(0.5);
+
+      this.zoneTexts.push(zoneText);
+    });
+  }
+
+  createPlayer() {
+    const startZone = this.zones[0];
+    if (startZone) {
+      const centerX = startZone.x * TILE_SIZE + (startZone.width * TILE_SIZE) / 2;
+      const centerY = startZone.y * TILE_SIZE + (startZone.height * TILE_SIZE) / 2;
+
+      this.player = this.add.rectangle(centerX, centerY, 20, 20, 0xff6b6b);
+      this.physics.add.existing(this.player);
+    }
+  }
+
+  createWalls() {
+    const MAP_WIDTH = this.zones.reduce((max, zone) => Math.max(max, zone.x + zone.width), 20) * TILE_SIZE;
+    const MAP_HEIGHT = this.zones.reduce((max, zone) => Math.max(max, zone.y + zone.height), 22) * TILE_SIZE;
+
+    this.walls = this.physics.add.staticGroup();
+
+    this.walls.create(MAP_WIDTH / 2, 0, 400, 10).refreshBody();
+    this.walls.create(MAP_WIDTH / 2, MAP_HEIGHT, 400, 10).refreshBody();
+    this.walls.create(0, MAP_HEIGHT / 2, 10, 400).refreshBody();
+    this.walls.create(MAP_WIDTH, MAP_HEIGHT / 2, 10, 400).refreshBody();
+  }
+
+  setupCamera() {
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    this.cameras.main.setBounds(0, 0, 2000, 2000);
+    this.cameras.main.setZoom(1);
+  }
+
+  setupInput() {
+    this.cursors = this.input.keyboard!.createCursorKeys();
+    this.wasd = {
+      W: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      A: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+      S: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+      D: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+    };
+  }
+
+  createAgents() {
+    let agentsData: any[] = [];
+
+    switch (this.scenario) {
+      case 'medieval':
+        agentsData = MEDIEVAL_AGENTS;
+        break;
+      case 'modern':
+        agentsData = MODERN_AGENTS;
+        break;
+      case 'scifi':
+        agentsData = SCIFI_AGENTS;
+        break;
+      case 'custom':
+        agentsData = this.registry.get('customConfig')?.agents || [];
+        break;
+      default:
+        agentsData = MEDIEVAL_AGENTS;
+    }
+
+    agentsData.forEach((profile, index) => {
+      const firstActivity = profile.schedule[0];
+      const startZone = firstActivity?.preferredZones[0] || this.zones[0]?.id || 'town_hall';
+
+      const zone = this.zones.find(z => z.id === startZone);
+      if (zone) {
+        const centerX = zone.x * TILE_SIZE + (zone.width * TILE_SIZE) / 2;
+        const centerY = zone.y * TILE_SIZE + (zone.height * TILE_SIZE) / 2;
+
+        const agent = new Agent(this, profile, startZone);
+        agent.setPosition(centerX + (index % 2) * 30 - 15, centerY + (index % 2) * 30 - 15);
+        this.agents.push(agent);
+      }
+    });
+  }
+
+  handleMovement() {
+    const speed = 200;
+    const velocity = this.physics.velocityFromRotation(0);
+
+    if (this.cursors.left.isDown || this.wasd.A.isDown) {
+      this.player.setVelocityX(-speed);
+    } else if (this.cursors.right.isDown || this.wasd.D.isDown) {
+      this.player.setVelocityX(speed);
+    } else {
+      this.player.setVelocityX(0);
+    }
+
+    if (this.cursors.up.isDown || this.wasd.W.isDown) {
+      this.player.setVelocityY(-speed);
+    } else if (this.cursors.down.isDown || this.wasd.S.isDown) {
+      this.player.setVelocityY(speed);
+    } else {
+      this.player.setVelocityY(0);
+    }
+  }
+
+  updateCurrentZone() {
+    const playerX = this.player.x;
+    const playerY = this.player.y;
+
+    const tileX = Math.floor(playerX / TILE_SIZE);
+    const tileY = Math.floor(playerY / TILE_SIZE);
+
+    const newZone = this.zones.find(zone =>
+      tileX >= zone.x && tileX < zone.x + zone.width &&
+      tileY >= zone.y && tileY < zone.y + zone.height
+    );
+
+    if (newZone && newZone.id !== this.currentZone) {
+      this.currentZone = newZone.id;
+    }
+  }
+
+  advanceTime() {
+    this.gameMinute += this.GAME_MINUTES_PER_TICK;
+    if (this.gameMinute >= 60) {
+      this.gameMinute = 0;
+      this.gameHour = (this.gameHour + 1) % 24;
+    }
+
+    this.agents.forEach(agent => {
+      agent.update(this.gameHour, this.agents);
+    });
+  }
+
+  setupObservation() {
+    this.input.keyboard!.on('keydown-TAB', () => {
+      this.nextAgent();
+    });
+
+    this.input.keyboard!.on('keydown-ESC', () => {
+      this.observedAgentIndex = -1;
+      this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+      this.agentPanel.clear();
+    });
+  }
+
+  nextAgent() {
+    if (this.agents.length === 0) return;
+
+    this.observedAgentIndex = (this.observedAgentIndex + 1) % (this.agents.length + 1);
+
+    if (this.observedAgentIndex === this.agents.length) {
+      this.observedAgentIndex = -1;
+      this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+      this.agentPanel.clear();
+    } else {
+      const agent = this.agents[this.observedAgentIndex];
+      this.cameras.main.startFollow(agent, true, 0.1, 0.1);
+      this.agentPanel.showAgent(agent);
+    }
+  }
+
+  setupClickHandler() {
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      const clickX = pointer.x;
+      const clickY = pointer.y;
+
+      this.agents.forEach((agent, index) => {
+        const distance = Phaser.Math.Distance.Between(clickX, clickY, agent.x, agent.y);
+        if (distance < 30) {
+          this.observedAgentIndex = index;
+          this.cameras.main.startFollow(agent, true, 0.1, 0.1);
+          this.agentPanel.showAgent(agent);
+        }
+      });
+    });
+  }
+
   update(time: number, delta: number) {
     this.handleMovement();
     this.updateCurrentZone();
-    this.hud.update(this.currentZone);
+    this.hud.update(this.currentZone, this.gameHour, this.gameMinute);
 
     this.tickAccumulator += delta;
     if (this.tickAccumulator >= this.TICK_INTERVAL) {
@@ -93,267 +374,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.agents.forEach((agent) => {
-      const prevZone = agent.state.location;
-      const prevActivity = agent.state.activity;
-      agent.update(this.gameHour, this.gameMinute, this.agents, Math.floor(this.tickAccumulator / this.TICK_INTERVAL));
-
-      const zoneChange = agent.getZoneChange();
-      if (zoneChange && zoneChange !== prevZone) {
-        const zoneLabels: Record<string, string> = {
-          reception: 'Reception', open_space_1: 'Open Space 1', open_space_2: 'Open Space 2',
-          meeting_1: 'Meeting Room 1', meeting_2: 'Meeting Room 2', kitchen: 'Kitchen',
-          office_cow: 'Office Coworking', wc_m: 'WC Men', wc_f: 'WC Women', corridor: 'Corridor',
-        };
-        this.eventLog.addEntry(`${agent.name} → ${zoneLabels[zoneChange] || zoneChange}`, '#4ecdc4', this.gameHour * 60 + this.gameMinute);
-      }
-
-      const actChange = agent.getActivityChange();
-      if (actChange && actChange !== prevActivity && actChange !== 'moving') {
-        const actLabels: Record<string, string> = {
-          work: 'начал работать', meeting: 'идёт на встречу', eat: 'пошёл есть',
-          socialize: 'общается', rest: 'отдыхает', idle: 'бездействует',
-        };
-        if (actLabels[actChange]) {
-          this.eventLog.addEntry(`${agent.name} ${actLabels[actChange]}`, '#48bb78', this.gameHour * 60 + this.gameMinute);
-        }
-      }
+      agent.update(this.gameHour, this.agents);
     });
-
-    this.statsPanel.update(this.agents);
-
-    if (this.observedAgentIndex >= 0 && this.observedAgentIndex < this.agents.length) {
-      this.agentPanel.update(this.agents[this.observedAgentIndex]);
-    }
-  }
-
-  private createAgents() {
-    const startPositions = [
-      { x: 2, y: 2 },
-      { x: 3, y: 2 },
-      { x: 4, y: 2 },
-      { x: 2, y: 3 },
-      { x: 3, y: 3 },
-      { x: 9, y: 2 },
-      { x: 10, y: 2 },
-      { x: 11, y: 2 },
-      { x: 9, y: 3 },
-      { x: 10, y: 3 },
-      { x: 17, y: 2 },
-      { x: 18, y: 2 },
-      { x: 19, y: 2 },
-      { x: 17, y: 3 },
-      { x: 18, y: 3 },
-    ];
-
-    for (let i = 0; i < AGENTS.length; i++) {
-      const pos = startPositions[i] || { x: 2, y: 2 };
-      const agent = new Agent(this, AGENTS[i], pos.x, pos.y);
-      this.agents.push(agent);
-    }
-  }
-
-  private advanceTime() {
-    this.gameMinute += this.GAME_MINUTES_PER_TICK;
-    if (this.gameMinute >= 60) {
-      this.gameMinute = 0;
-      this.gameHour = (this.gameHour + 1) % 24;
-    }
-
-    this.hud.updateTime(this.gameHour, this.gameMinute);
-    this.hud.updateAgentCount(this.agents.length);
-  }
-
-  private drawMap() {
-    const graphics = this.add.graphics();
-
-    ZONES.forEach(zone => {
-      graphics.fillStyle(zone.color, 1);
-      graphics.fillRect(
-        zone.x * TILE_SIZE,
-        zone.y * TILE_SIZE,
-        zone.width * TILE_SIZE,
-        zone.height * TILE_SIZE
-      );
-
-      const text = this.add.text(
-        (zone.x + zone.width / 2) * TILE_SIZE,
-        (zone.y + zone.height / 2) * TILE_SIZE,
-        zone.name,
-        {
-          fontSize: '10px',
-          color: '#ffffff',
-          align: 'center'
-        }
-      ).setOrigin(0.5);
-      this.zoneTexts.push(text);
-    });
-
-    graphics.fillStyle(0x4a5568, 1);
-    graphics.fillRect(6 * TILE_SIZE, 0, TILE_SIZE, MAP_HEIGHT * TILE_SIZE);
-
-    graphics.lineStyle(2, 0x718096, 1);
-    graphics.strokeRect(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE);
-  }
-
-  private createPlayer() {
-    this.player = this.add.rectangle(
-      2 * TILE_SIZE + TILE_SIZE / 2,
-      2 * TILE_SIZE + TILE_SIZE / 2,
-      24,
-      24,
-      0x48bb78
-    );
-    this.physics.add.existing(this.player);
-    const body = this.player.body as Phaser.Physics.Arcade.Body;
-    body.setCollideWorldBounds(true);
-  }
-
-  private createWalls() {
-    this.walls = this.physics.add.staticGroup();
-
-    this.createWallBorder();
-    this.createRoomDividers();
-  }
-
-  private createWallBorder() {
-    const wallThickness = 4;
-
-    this.addWall(0, 0, MAP_WIDTH * TILE_SIZE, wallThickness);
-    this.addWall(0, MAP_HEIGHT * TILE_SIZE - wallThickness, MAP_WIDTH * TILE_SIZE, wallThickness);
-    this.addWall(0, 0, wallThickness, MAP_HEIGHT * TILE_SIZE);
-    this.addWall(MAP_WIDTH * TILE_SIZE - wallThickness, 0, wallThickness, MAP_HEIGHT * TILE_SIZE);
-  }
-
-  private createRoomDividers() {
-    const wallThickness = 4;
-
-    this.addWall(6 * TILE_SIZE - wallThickness / 2, 6 * TILE_SIZE, wallThickness, 1 * TILE_SIZE);
-    this.addWall(14 * TILE_SIZE - wallThickness / 2, 6 * TILE_SIZE, wallThickness, 1 * TILE_SIZE);
-
-    this.addWall(6 * TILE_SIZE - wallThickness / 2, 11 * TILE_SIZE, wallThickness, 1 * TILE_SIZE);
-    this.addWall(14 * TILE_SIZE - wallThickness / 2, 11 * TILE_SIZE, wallThickness, 1 * TILE_SIZE);
-
-    this.addWall(6 * TILE_SIZE - wallThickness / 2, 17 * TILE_SIZE, wallThickness, 1 * TILE_SIZE);
-    this.addWall(14 * TILE_SIZE - wallThickness / 2, 17 * TILE_SIZE, wallThickness, 1 * TILE_SIZE);
-  }
-
-  private addWall(x: number, y: number, width: number, height: number) {
-    const wall = this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x2d3748);
-    this.physics.add.existing(wall, true);
-    this.walls.add(wall);
-  }
-
-  private setupCamera() {
-    this.cameras.main.setBounds(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE);
-    this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
-
-    this.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number) => {
-      const camera = this.cameras.main;
-      const newZoom = camera.zoom - deltaY * 0.001;
-      camera.setZoom(Phaser.Math.Clamp(newZoom, 0.5, 2));
-    });
-  }
-
-  private setupInput() {
-    if (!this.input.keyboard) return;
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.wasd = {
-      W: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-      A: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-      S: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-      D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-    };
-  }
-
-  private setupObservation() {
-    if (!this.input.keyboard) return;
-
-    this.input.keyboard.on('keydown-TAB', () => {
-      if (this.agents.length === 0) return;
-
-      if (this.observedAgentIndex >= 0 && this.observedAgentIndex < this.agents.length) {
-        this.agents[this.observedAgentIndex].setHighlighted(false);
-      }
-
-      this.observedAgentIndex = (this.observedAgentIndex + 1) % this.agents.length;
-      const agent = this.agents[this.observedAgentIndex];
-      this.cameras.main.startFollow(agent.sprite, true, 0.08, 0.08);
-      this.agentPanel.show(agent);
-      agent.setHighlighted(true);
-    });
-
-    this.input.keyboard.on('keydown-ESC', () => {
-      if (this.observedAgentIndex >= 0 && this.observedAgentIndex < this.agents.length) {
-        this.agents[this.observedAgentIndex].setHighlighted(false);
-      }
-      this.observedAgentIndex = -1;
-      this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
-      this.agentPanel.hide();
-    });
-  }
-
-  private setupClickHandler() {
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      const clickedAgent = this.agents.find(a => {
-        const dist = Phaser.Math.Distance.Between(pointer.x, pointer.y, a.sprite.x, a.sprite.y);
-        return dist < 20;
-      });
-
-      if (this.observedAgentIndex >= 0 && this.observedAgentIndex < this.agents.length) {
-        this.agents[this.observedAgentIndex].setHighlighted(false);
-      }
-
-      if (clickedAgent) {
-        this.observedAgentIndex = this.agents.indexOf(clickedAgent);
-        this.cameras.main.startFollow(clickedAgent.sprite, true, 0.08, 0.08);
-        this.agentPanel.show(clickedAgent);
-        clickedAgent.setHighlighted(true);
-      } else {
-        this.observedAgentIndex = -1;
-        this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
-        this.agentPanel.hide();
-      }
-    });
-  }
-
-  private handleMovement() {
-    const body = this.player.body as Phaser.Physics.Arcade.Body;
-    const speed = 160;
-
-    body.setVelocity(0);
-
-    if (this.cursors.left.isDown || this.wasd.A.isDown) {
-      body.setVelocityX(-speed);
-    } else if (this.cursors.right.isDown || this.wasd.D.isDown) {
-      body.setVelocityX(speed);
-    }
-
-    if (this.cursors.up.isDown || this.wasd.W.isDown) {
-      body.setVelocityY(-speed);
-    } else if (this.cursors.down.isDown || this.wasd.S.isDown) {
-      body.setVelocityY(speed);
-    }
-
-    body.velocity.normalize().scale(speed);
-  }
-
-  private updateCurrentZone() {
-    const playerTileX = Math.floor(this.player.x / TILE_SIZE);
-    const playerTileY = Math.floor(this.player.y / TILE_SIZE);
-
-    for (const zone of ZONES) {
-      if (
-        playerTileX >= zone.x &&
-        playerTileX < zone.x + zone.width &&
-        playerTileY >= zone.y &&
-        playerTileY < zone.y + zone.height
-      ) {
-        this.currentZone = zone.id;
-        return;
-      }
-    }
-
-    this.currentZone = 'corridor';
   }
 }

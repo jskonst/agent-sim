@@ -1,35 +1,89 @@
 # ARCHITECTURE.md — Agent Sim
 
-## 1. Сеттинг: Офисный этаж (Option B)
+## 1. Сеттинг: Небольшой городок
 
 **Обоснование:**
-- Удобство тайловой карты: прямоугольные комнаты, коридоры, двери
-- Естественные зоны с разными активностями (open space → работа, кухня → еда, переговорки →meetings)
-- 10-20 агентов合理но распределены по этажу
-- Наблюдение интересно: агенты работают, обедают, болтают у кофемашины
+- Больше свободы для творчества (3 сценария: средневековье, современный, фантастика)
+- Естественные локации с разными активностями
+- 10-15 агентов合理но распределены по городку
+- Конфигурации можно сохранять/загружать
 
-**Локации:**
-```
-┌─────────────────────────────────────────┐
-│  reception │  open_space_1 │  open_space_2 │
-│            │               │              │
-├────────────┼───────────────┼──────────────┤
-│  meeting_1 │   corridor    │  meeting_2   │
-├────────────┼───────────────┼──────────────┤
-│  kitchen   │   corridor    │  office_cow  │
-├────────────┼───────────────┼──────────────┤
-│  wc_m      │   corridor    │  wc_f        │
-└─────────────────────────────────────────┘
-```
+**3 сценария:**
 
-**Зоны и их описание для LLM:**
-- `reception`: "Ресепшен у входа. Охранник сидит здесь. Гости ждут."
-- `open_space_1/2`: "Рабочие столы. Тут работают сотрудники."
-- `meeting_1/2`: "Переговорки для совещаний."
-- `kitchen`: "Кухня. Кофемашина, микроволновка. Место для отдыха."
-- `corridor`: "Коридор. Люди ходят из комнаты в комнату."
-- `office_cow`: "Кабинет руководителя. Рабочий стол, стул."
-- `wc_m/wc_f`: "Туалеты."
+### Сценарий 1: Средневековый городок
+**Локации (10):**
+- `town_hall` — Ратуша (управление, совет старейшин)
+- `tavern` — Таверна (еда, отдых, слухи)
+- `market` — Рынок (торговля, новости)
+- `blacksmith` — Кузница (ремонт, инструменты)
+- `temple` — Храм (исцеление, молитвы)
+- `farm` — Ферма (урожай, работа)
+- `house_1` — Дом селянина (жильё)
+- `house_2` — Дом ремесленника (жильё)
+- `fountain` — Фонтан (сборы, встречи)
+- `castle_gate` — Ворота замка (охрана, вход/выход)
+
+**Агенты (10):**
+1. `mayor` — Мэр (официальное лицо, в ратуше)
+2. `merchant` — Торговец (на рынке, в таверне)
+3. `blacksmith` — Кузнец (в кузнице)
+4. `priest` — Жрец (в храме)
+5. `farmer` — Фермер (на ферме)
+6. `guard` — Охранник (у ворот, патрулирует)
+7. `bard` — Бард (в таверне, фонтан)
+8. `stranger` — Странник (где угодно)
+9. `peasant` — Селянин (ферма, дом)
+10. `apprentice` — Ученик (с ментором)
+
+### Сценарий 2: Современный пригород
+**Локации (10):**
+- `city_hall` — Мэрия (администрация)
+- `supermarket` — Супермаркет (продукты)
+- `cafe` — Кафе (еда, встречи)
+- `auto_repair` — Автосервис (ремонт)
+- `park` — Парк (отдых, прогулки)
+- `school` — Школа (обучение)
+- `house_1` — Дом семьи (жильё)
+- `house_2` — Квартира (жильё)
+- `bus_stop` — Автобусная остановка (транспорт)
+- `community_center` — Общественный центр (мероприятия)
+
+**Агенты (10):**
+1. `mayor` — Мэр (в мэрии)
+2. `cashier` — Кассир (в супермаркете)
+3. `chef` — Повар (в кафе)
+4. `mechanic` — Механик (в автосервисе)
+5. `teacher` — Учитель (в школе)
+6. `student` — Школьник (школа, дом)
+7. `senior` — Пенсионер (парк, дом)
+8. `entrepreneur` — Предприниматель (кафе, общественный центр)
+9. `taxi_driver` — Таксист (где угодно)
+10. `athlete` — Спортсмен (парк, спортзал)
+
+### Сценарий 3: Фантастическая станция
+**Локации (10):**
+- `command_center` — Командный центр (управление)
+- `medbay` — Медбей (исцеление)
+- `bar` — Бар (отдых, встречи)
+- `cargo_dock` — Грузовой док (торговля)
+- `research_lab` — Исследования (наука)
+- `living_quarters_1` — Жилой модуль (жильё)
+- `living_quarters_2` — Жилой модуль (жильё)
+- `corridors` — Коридоры (перемещение)
+- `hangar` — Ангар (корабли)
+- `security_station` — Служба безопасности (охрана)
+
+**Агенты (10):**
+1. `commander` — Командир (в командном центре)
+2. `doctor` — Врач (в медбее)
+3. `bartender` — Бармен (в баре)
+4. `cargo_worker` — Грузчик (в доке)
+5. `scientist` — Учёный (в лаборатории)
+6. `engineer` — Инженер (в ангаре, жилых модулях)
+7. `diplomat` — Дипломат (в командном центре, жилых модулях)
+8. `passenger` — Пассажир (где угодно)
+9. `security_officer` — Офицер безопасности (на посту, патрулирует)
+10. `ai_system` — AI-системы (везде, виртуальный агент)
 
 ---
 
@@ -44,13 +98,14 @@
 ### Backend (опционально)
 - **Язык:** Go
 - **Причина:** Один бинарник, embed статики, familiar (b5-game опыт)
-- **Роль:** 
+- **Роль:**
   - API для LLM-запросов (проксирует OpenRouter)
   - Запуск симуляции (tick loop)
   - WebSocket для real-time обновлений
 
 ### Хранение
 - **IndexedDB:** Состояния агентов, логи, настройки
+- **Конфигурации:** JSON-файлы (скачать/загрузить)
 - **Память агента:** Последние 10 significant events (in-memory + IndexedDB)
 
 ### LLM
@@ -66,6 +121,8 @@
 agent-sim/
 ├── ARCHITECTURE.md
 ├── TASK_ARCHITECTURE.md
+├── MIMO_TASK_PHASE0.md
+├── MIMO_TASK_PHASE1.md
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
@@ -76,6 +133,7 @@ agent-sim/
 │   │   ├── config.ts            # Phaser config
 │   │   ├── scenes/
 │   │   │   ├── Boot.ts
+│   │   │   ├── MenuScene.ts     # Scenario selection menu
 │   │   │   ├── GameWorld.ts     # Main game scene
 │   │   │   └── UI.ts            # UI overlay scene
 │   │   ├── entities/
@@ -87,8 +145,12 @@ agent-sim/
 │   │   │   ├── MovementSystem.ts
 │   │   │   ├── InteractionSystem.ts
 │   │   │   └── ScheduleSystem.ts
-│   │   └── maps/
-│   │       └── office.ts        # Map definition
+│   │   ├── maps/
+│   │   │   ├── medieval.ts      # Medieval town map
+│   │   │   ├── modern.ts        # Modern suburb map
+│   │   │   └── scifi.ts         # Sci-fi station map
+│   │   └── config/
+│   │       └── scenarios.ts     # Scenario definitions
 │   │
 │   ├── ai/
 │   │   ├── llmClient.ts         # OpenRouter API calls
@@ -97,22 +159,23 @@ agent-sim/
 │   │   └── triggers.ts          # LLM trigger conditions
 │   │
 │   ├── data/
-│   │   ├── agents.ts            # Agent definitions
-│   │   ├── schedules.ts         # Default schedules
-│   │   └── relationships.ts     # Initial relationships
+│   │   ├── medieval_agents.ts   # Medieval scenario agents
+│   │   ├── modern_agents.ts     # Modern scenario agents
+│   │   ├── scifi_agents.ts      # Sci-fi scenario agents
+│   │   └── schedules.ts         # Default schedules
 │   │
 │   └── ui/
 │       ├── hud.ts               # Top HUD (time, location)
 │       ├── agentPanel.ts        # Selected agent panel
 │       ├── eventLog.ts          # Event feed
-│       └── stats.ts             # Statistics panel
+│       ├── stats.ts             # Statistics panel
+│       └── scenarioMenu.ts      # Scenario selection UI
 │
 ├── public/
 │   ├── assets/
 │   │   ├── tiles/
 │   │   └── sprites/
-│   └── maps/
-│       └── office.json          # Tiled map
+│   └── configs/                 # User configs
 │
 └── server/                      # Go backend (optional)
     ├── main.go
@@ -124,13 +187,53 @@ agent-sim/
 
 ## 4. Схема данных (типы)
 
+### ScenarioConfig
+```typescript
+interface ScenarioConfig {
+  id: string;
+  name: string;
+  description: string;
+  scenario: 'medieval' | 'modern' | 'scifi';
+
+  map: {
+    width: number;
+    height: number;
+    tileSize: number;
+    tiles: TileType[][];
+  };
+
+  locations: LocationConfig[];
+  agents: AgentProfile[];
+  time: {
+    startHour: number;
+    tickRate: number;  // minutes per tick
+  };
+}
+
+interface TileType {
+  walkable: boolean;
+  locationId?: string;
+  type: 'floor' | 'wall' | 'door' | 'special';
+}
+
+interface LocationConfig {
+  id: string;
+  name: string;
+  description: string;
+  x: number;           // tile coordinates
+  y: number;
+  width: number;
+  height: number;
+}
+```
+
 ### Agent
 ```typescript
 interface Agent {
   id: string;
   name: string;
-  role: string;                    // "developer", "manager", "hr"
-  
+  role: string;        // "mayor", "merchant", etc.
+
   // Характеристики (1-10)
   stats: {
     charisma: number;
@@ -138,7 +241,7 @@ interface Agent {
     sociability: number;
     emotionalStability: number;
   };
-  
+
   // Текущее состояние
   state: {
     location: string;              // Zone ID
@@ -148,16 +251,16 @@ interface Agent {
     x: number;                     // Tile coords
     y: number;
   };
-  
+
   // Память (последние события)
   memory: Event[];
-  
+
   // Расписание
   schedule: ScheduleEntry[];
-  
+
   // Отношения
   relationships: Map<string, number>;  // agentID → disposition (-100..100)
-  
+
   // Долгосрочные цели
   goals: string[];
 }
@@ -265,7 +368,7 @@ const DAY_END_HOUR = 18;            // до 18:00
 
 ### System Prompt для агента
 ```
-Ты — {name}, {role} в офисе.
+Ты — {name}, {role} в городе.
 Характер: {charisma}/10 харизма, {industriousness}/10 трудолюбие
 Текущее место: {location}
 Настроение: {mood}/100, Энергия: {energy}/100
@@ -309,10 +412,32 @@ const cacheKey = md5(JSON.stringify({
 
 ## 7. UI/UX
 
+### Меню выбора сценария
+```
+┌──────────────────────────────────────────────┐
+│        Agent Sim - Выберите сценарий        │
+├──────────────────────────────────────────────┤
+│                                              │
+│  🏰 Средневековый городок                    │
+│  Рынок, таверна, кузница, храм...            │
+│                                              │
+│  🏢 Современный пригород                     │
+│  Мэрия, супермаркет, кафе, парк...           │
+│                                              │
+│  🚀 Фантастическая станция                   │
+│  Командный центр, медбей, ангар...           │
+│                                              │
+│  📁 Загрузить конфигурацию                   │
+│  ⬇️ Скачать конфигурацию                      │
+│                                              │
+│  [Старт]                                     │
+└──────────────────────────────────────────────┘
+```
+
 ### Основной экран
 ```
 ┌──────────────────────────────────────────────────────┐
-│ 🕐 14:30  │  📍 Open Space 1  │  👤 5 agents nearby │
+│ 🕐 14:30  │  📍 Market  │  👤 3 agents nearby       │
 ├──────────────────────────────────────────────────────┤
 │                                                      │
 │   ┌─────────┐    ┌─────────┐                        │
@@ -333,15 +458,15 @@ const cacheKey = md5(JSON.stringify({
 ### Панель агента (по клику)
 ```
 ┌─────────────────────────────────┐
-│ 👤 Alice (Developer)            │
+│ 👤 Alice (Merchant)            │
 ├─────────────────────────────────┤
 │ Настроение: ████████░░ 80%      │
 │ Энергия:   ██████░░░░ 60%      │
 │                                 │
-│ 📍 Open Space 1                 │
+│ 📍 Market                       │
 │ 💼 working                      │
 │                                 │
-│ 💭 "Надо доделать API..."       │
+│ 💭 "Нужно продать те специи..." │
 │                                 │
 │ 🤝 Отношения:                   │
 │   Bob: +15 (друг)               │
@@ -365,19 +490,23 @@ const cacheKey = md5(JSON.stringify({
 
 ## 8. Пофазный план реализации
 
-### Фаза 0: Каркас (1-2 дня)
-- [ ] Инициализация Vite + Phaser + TypeScript
-- [ ] Базовая сцена с камерой
-- [ ] Простая карта (тайлы пола/стен)
-- [ ] Игрок-спрайт с WASD движением
-- [ ] Базовый HUD (время, локация)
+### Фаза 0: Каркас (готово)
+- [x] Инициализация Vite + Phaser + TypeScript
+- [x] Базовая сцена с камерой
+- [x] Простая карта (тайлы пола/стен)
+- [x] Игрок-спрайт с WASD движением
+- [x] Базовый HUD (время, локация)
 
-### Фаза 1: Агенты (2-3 дня)
+### Фаза 1: Агенты и сценарии (2-3 дня) — ТЕКУЩАЯ
+- [ ] Меню выбора сценария
+- [ ] 3 сценария (средневековье, современный, фантастика)
+- [ ] 10 агентов для каждого сценария
+- [ ] Тайловые карты для каждого сценария
 - [ ] Класс Agent с состоянием
-- [ ] Тайловая карта (Tiled или генерация)
 - [ ] A* pathfinding
 - [ ] Расписания (work/eat/rest)
 - [ ] Автономное движение агентов
+- [ ] Система сохранения/загрузки конфигураций (JSON)
 
 ### Фаза 2: LLM-агенты (3-4 дня)
 - [ ] OpenRouter API клиент
@@ -393,8 +522,7 @@ const cacheKey = md5(JSON.stringify({
 - [ ] Статистика (среднее настроение, кол-во взаимодействий)
 
 ### Фаза 4: Контент (2-3 дня)
-- [ ] 15 агентов с характеристиками
-- [ ] 5 расписаний (разные роли)
+- [ ] Уточнённые расписания для каждого сценария
 - [ ] Начальные отношения
 - [ ] Сбалансировка LLM-триггеров
 
@@ -414,7 +542,7 @@ const cacheKey = md5(JSON.stringify({
 ## 9. Ограничения и оптимизации
 
 ### Ограничения
-- 10-20 агентов (не 100)
+- 10-15 агентов (не 100)
 - LLM-запросы только по триггерам (не каждый тик)
 - Дёшево: GPT-4o-mini, кеш, rate limiting
 - Один разработчик в свободное время
@@ -427,9 +555,9 @@ const cacheKey = md5(JSON.stringify({
 - **Оффлайн:** IndexedDB для состояний, можно закрыть вкладку
 
 ### Бюджет LLM
-- ~15 агентов × 10 запросов/день × $0.0003/запрос = $0.045/день
-- При активных диалогах: ~$0.15/день
-- Максимум: $0.50/день
+- ~10 агентов × 10 запросов/день × $0.0003/запрос = $0.03/день
+- При активных диалогах: ~$0.10/день
+- Максимум: $0.30/день
 
 ---
 
@@ -442,3 +570,5 @@ const cacheKey = md5(JSON.stringify({
 | Какой LLM? | **GPT-4o-mini** | Дёшево, быстро, достаточно для ролей |
 | WebSocket или polling? | **WebSocket** | Real-time, меньше latency |
 | IndexedDB или localStorage? | **IndexedDB** | Больше места, async API, структурированные данные |
+| 3 сценария или 1? | **3 сценария** | Больше свободы, эксперименты с сеттингами |
+| JSON конфигурации? | **Да** | Простой формат, скачать/загрузить, редактировать |
