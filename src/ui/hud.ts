@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
 import { Agent } from '../game/entities/Agent';
 import { ScenarioConfig } from '../game/config/scenarios';
+import { MEDIEVAL_AGENTS } from '../data/medieval_agents';
+import { MODERN_AGENTS } from '../data/modern_agents';
+import { SCIFI_AGENTS } from '../data/scifi_agents';
 
 export class HUD {
   private scene: Phaser.Scene;
@@ -9,6 +12,7 @@ export class HUD {
   private agentsText: Phaser.GameObjects.Text;
   private scenarioText: Phaser.GameObjects.Text;
   private exportButton: Phaser.GameObjects.Text;
+  private profilesButton: Phaser.GameObjects.Text;
   private agents: Agent[] = [];
   private gameHour: number = 8;
   private gameMinute: number = 30;
@@ -53,6 +57,17 @@ export class HUD {
 
     this.exportButton.on('pointerdown', () => {
       this.exportConfig();
+    });
+
+    this.profilesButton = scene.add.text(16, 172, '⬇️ Скачать профили', {
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#4ecdc488',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(100).setInteractive();
+
+    this.profilesButton.on('pointerdown', () => {
+      this.exportProfiles();
     });
   }
 
@@ -184,6 +199,37 @@ export class HUD {
     const a = document.createElement('a');
     a.href = url;
     a.download = `agent_sim_${scenario?.scenario || 'custom'}_${formatDate()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  exportProfiles() {
+    const scenario = this.scene.registry.get('selectedScenario') as ScenarioConfig | null;
+    const customConfig = this.scene.registry.get('customConfig') as any;
+
+    let scenarioKey: string = scenario?.scenario || 'medieval';
+    let profiles: any[];
+
+    if (customConfig) {
+      profiles = customConfig.agents || [];
+      scenarioKey = 'custom';
+    } else if (scenarioKey === 'modern') {
+      profiles = MODERN_AGENTS;
+    } else if (scenarioKey === 'scifi') {
+      profiles = SCIFI_AGENTS;
+    } else {
+      profiles = MEDIEVAL_AGENTS;
+    }
+
+    const data = { scenario: scenarioKey, agents: profiles };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `agent_sim_profiles_${scenarioKey}_${formatDate()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
