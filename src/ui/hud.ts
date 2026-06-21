@@ -146,10 +146,10 @@ export class HUD {
           id: agent.id,
           name: agent.name,
           state: {
-            location: agent.state.location,
-            activity: agent.state.activity,
-            mood: agent.state.mood,
-            energy: agent.state.energy,
+            location: agent.aiState.location,
+            activity: agent.aiState.activity,
+            mood: agent.aiState.mood,
+            energy: agent.aiState.energy,
             x: agent.x,
             y: agent.y
           }
@@ -163,10 +163,10 @@ export class HUD {
         agents: this.agents.map(agent => ({
           ...agent.profile,
           state: {
-            location: agent.state.location,
-            activity: agent.state.activity,
-            mood: agent.state.mood,
-            energy: agent.state.energy,
+            location: agent.aiState.location,
+            activity: agent.aiState.activity,
+            mood: agent.aiState.mood,
+            energy: agent.aiState.energy,
             x: agent.x,
             y: agent.y
           }
@@ -180,10 +180,10 @@ export class HUD {
         agents: this.agents.map(agent => ({
           ...agent.profile,
           state: {
-            location: agent.state.location,
-            activity: agent.state.activity,
-            mood: agent.state.mood,
-            energy: agent.state.energy,
+            location: agent.aiState.location,
+            activity: agent.aiState.activity,
+            mood: agent.aiState.mood,
+            energy: agent.aiState.energy,
             x: agent.x,
             y: agent.y
           }

@@ -223,7 +223,7 @@ export class GameScene extends Phaser.Scene {
       const centerX = startZone.x * TILE_SIZE + (startZone.width * TILE_SIZE) / 2;
       const centerY = startZone.y * TILE_SIZE + (startZone.height * TILE_SIZE) / 2;
 
-      this.player = this.add.rectangle(centerX, centerY, 20, 20, 0xff6b6b);
+      this.player = this.add.rectangle(centerX, centerY, 20, 20, 0xff6b6b) as unknown as Phaser.GameObjects.Rectangle & { body: Phaser.Physics.Arcade.Body };
       this.physics.add.existing(this.player);
     }
   }
@@ -235,10 +235,10 @@ export class GameScene extends Phaser.Scene {
     this.walls = this.physics.add.staticGroup();
 
     // Create border walls
-    this.walls.create(MAP_WIDTH / 2, 0, MAP_WIDTH, 10).refreshBody();
-    this.walls.create(MAP_WIDTH / 2, MAP_HEIGHT, MAP_WIDTH, 10).refreshBody();
-    this.walls.create(0, MAP_HEIGHT / 2, 10, MAP_HEIGHT).refreshBody();
-    this.walls.create(MAP_WIDTH, MAP_HEIGHT / 2, 10, MAP_HEIGHT).refreshBody();
+    this.walls.create(MAP_WIDTH / 2, 0, MAP_WIDTH as unknown as string, 10).refreshBody();
+    this.walls.create(MAP_WIDTH / 2, MAP_HEIGHT, MAP_WIDTH as unknown as string, 10).refreshBody();
+    this.walls.create(0, MAP_HEIGHT / 2, 10 as unknown as string, MAP_HEIGHT).refreshBody();
+    this.walls.create(MAP_WIDTH, MAP_HEIGHT / 2, 10 as unknown as string, MAP_HEIGHT).refreshBody();
   }
 
   setupCamera() {

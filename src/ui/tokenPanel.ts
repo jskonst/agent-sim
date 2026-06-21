@@ -98,7 +98,7 @@ export class TokenPanel {
     this.texts[1].setText(`Глобально: ${this.formatTokens(g.daily.tokens)}/${this.formatTokens(config.global.maxTokensPerDay)} (${Math.round(gDailyPct * 100)}%)`);
     this.texts[1].setColor(gStatus);
     this.texts[2].setText(`  Час: ${this.formatTokens(g.hourly.tokens)}/${this.formatTokens(config.global.maxTokensPerHour)} (${Math.round(gHourlyPct * 100)}%)`);
-    this.texts[3].setText(`  Запросов: ${g.count} дн / ${snapshot.totalRequests} всего`);
+    this.texts[3].setText(`  Запросов: ${g.daily.count} дн / ${snapshot.totalRequests} всего`);
     this.texts[4].setText(`  Токенов всего: ${this.formatTokens(snapshot.totalTokens)}`);
 
     this.texts[5].setText('🔧 По инструментам:');

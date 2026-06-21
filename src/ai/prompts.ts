@@ -1,15 +1,15 @@
-import { AgentProfile } from '../data/agents';
+import { AgentProfile } from '../types/agent';
 import { AgentState, AgentEvent } from '../game/entities/Agent';
 import { LLMMessage } from './llmClient';
 
 export function buildSystemPrompt(agent: AgentProfile, state: AgentState, hour: number): string {
   const relationshipLines = Object.entries(state.relationships || {})
-    .map(([id, val]) => `- ${id}: ${val} (${val > 10 ? 'друг' : val < -10 ? 'неприязнь' : 'нейтрально'})`)
+    .map(([id, val]: [string, number]) => `- ${id}: ${val} (${val > 10 ? 'друг' : val < -10 ? 'неприязнь' : 'нейтрально'})`)
     .join('\n');
 
   const memoryLines = (state.memory || [])
     .slice(-5)
-    .map(e => `- ${e.description}`)
+    .map((e: AgentEvent) => `- ${e.description}`)
     .join('\n');
 
   return `Ты — ${agent.name}, ${agent.role} в офисе.

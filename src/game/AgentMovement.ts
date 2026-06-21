@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { Agent } from './Agent';
-import { GameTime } from '../GameTime';
+import { Agent } from './entities/Agent';
+import { GameTime } from './GameTime';
 
 /**
  * Agent Movement System
@@ -88,12 +88,12 @@ export class AgentMovement {
     // Find current activity from schedule
     const currentActivity = this.findCurrentActivity(agent.profile.schedule, currentTime);
 
-    if (currentActivity && currentActivity.location !== agent.state.location) {
+    if (currentActivity && currentActivity.location !== agent.aiState.location) {
       // Agent needs to move to new location
       this.moveToLocation(agent, currentActivity.location);
     } else if (currentActivity) {
       // Agent is at correct location, perform activity
-      agent.state.activity = currentActivity.activity;
+      agent.aiState.activity = currentActivity.activity;
     }
 
     // Update agent's actual movement
@@ -122,7 +122,7 @@ export class AgentMovement {
     const targetPosition = this.getLocationPosition(location);
     if (targetPosition) {
       agent.setTarget(targetPosition.x, targetPosition.y);
-      agent.state.location = location;
+      agent.aiState.location = location;
     }
   }
 
@@ -181,6 +181,7 @@ export class AgentMovement {
     }
 
     const target = agent.getTarget();
+    if (!target) return;
     const currentX = agent.x;
     const currentY = agent.y;
 
@@ -196,7 +197,7 @@ export class AgentMovement {
     }
 
     // Calculate movement speed based on energy
-    const speedMultiplier = agent.state.energy / 100;
+    const speedMultiplier = agent.aiState.energy / 100;
     const speed = this.WALK_SPEED * speedMultiplier * (delta / 1000);
 
     // Normalize and move
@@ -237,7 +238,7 @@ export class AgentMovement {
    */
   private triggerInteraction(agent1: Agent, agent2: Agent): void {
     // Only interact if both agents have sufficient energy
-    if (agent1.state.energy < 30 || agent2.state.energy < 30) {
+    if (agent1.aiState.energy < 30 || agent2.aiState.energy < 30) {
       return;
     }
 
@@ -250,12 +251,12 @@ export class AgentMovement {
     const greeting = greetings[Math.floor(Math.random() * greetings.length)];
 
     // Boost moods
-    agent1.state.mood = Math.min(100, agent1.state.mood + 5);
-    agent2.state.mood = Math.min(100, agent2.state.mood + 5);
+    agent1.aiState.mood = Math.min(100, agent1.aiState.mood + 5);
+    agent2.aiState.mood = Math.min(100, agent2.aiState.mood + 5);
 
     // Slightly reduce energy from social interaction
-    agent1.state.energy = Math.max(0, agent1.state.energy - 2);
-    agent2.state.energy = Math.max(0, agent2.state.energy - 2);
+    agent1.aiState.energy = Math.max(0, agent1.aiState.energy - 2);
+    agent2.aiState.energy = Math.max(0, agent2.aiState.energy - 2);
 
     // Log interaction (could be displayed in UI)
     console.log(`${agent1.name} greeted ${agent2.name}: "${greeting}"`);

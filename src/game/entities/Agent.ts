@@ -1,22 +1,30 @@
 import Phaser from 'phaser';
-import { AgentProfile } from '../../types/agent';
+import { AgentProfile, ScheduleEntry } from '../../types/agent';
+
+export interface AgentState {
+  location: string;
+  activity: string;
+  mood: number;
+  energy: number;
+  x: number;
+  y: number;
+  relationships: Record<string, number>;
+  memory: { description: string }[];
+}
+
+export interface AgentEvent {
+  description: string;
+}
 
 export class Agent extends Phaser.GameObjects.Container {
   id: string;
   name: string;
   profile: AgentProfile;
 
-  state: {
-    location: string;
-    activity: string;
-    mood: number;
-    energy: number;
-    x: number;
-    y: number;
-  };
+  aiState: AgentState;
 
-  sprite: Phaser.GameObjects.Arc;
-  nameLabel: Phaser.GameObjects.Text;
+  sprite!: Phaser.GameObjects.Arc;
+  nameLabel!: Phaser.GameObjects.Text;
 
   path: Phaser.Math.Vector2[] = [];
   private moveProgress: number = 0;
@@ -24,19 +32,21 @@ export class Agent extends Phaser.GameObjects.Container {
 
   constructor(scene: Phaser.Scene, profile: AgentProfile, startZone: string) {
     super(scene, 0, 0);
-    scene.add.existing(this);
+    scene.add.existing(this as unknown as Phaser.GameObjects.GameObject);
 
     this.id = profile.id;
     this.name = profile.name;
     this.profile = profile;
 
-    this.state = {
+    this.aiState = {
       location: startZone,
       activity: 'rest',
       mood: 50,
       energy: 100,
       x: 0,
-      y: 0
+      y: 0,
+      relationships: { ...profile.relationships },
+      memory: []
     };
 
     // Set initial position based on zone
@@ -125,7 +135,7 @@ export class Agent extends Phaser.GameObjects.Container {
 
     // Check schedule and change activity if needed
     const activity = this.getActivityAtHour(gameHour);
-    if (activity && activity.activity !== this.state.activity) {
+    if (activity && activity.activity !== this.aiState.activity) {
       this.changeActivity(activity.activity, activity.zones[0]);
     }
 
@@ -180,7 +190,7 @@ export class Agent extends Phaser.GameObjects.Container {
   }
 
   private changeActivity(newActivity: string, newZone: string) {
-    this.state.activity = newActivity;
+    this.aiState.activity = newActivity;
 
     // TODO: Найти путь к новой зоне
     // this.path = this.findPath(this.state.location, newZone);
@@ -197,10 +207,18 @@ export class Agent extends Phaser.GameObjects.Container {
     return [];
   }
 
+  private handleAgentInteractions(_agents: Agent[]): void {
+    // Placeholder for agent interaction logic
+  }
+
+  getActivityChange(): string | null {
+    return null;
+  }
+
   setPosition(x: number, y: number): this {
     super.setPosition(x, y);
-    this.state.x = x;
-    this.state.y = y;
+    this.aiState.x = x;
+    this.aiState.y = y;
     return this;
   }
 }

@@ -121,7 +121,7 @@ export class AgentPanel {
     this.nameText.setText(agent.name);
     this.roleText.setText(agent.profile.role.replace('_', ' '));
 
-    const mood = Math.round(agent.state.mood);
+    const mood = Math.round(agent.aiState.mood);
     this.moodBar.width = (mood / 100) * 150;
     this.moodText.setText(`${mood}`);
     if (mood > 60) {
@@ -132,7 +132,7 @@ export class AgentPanel {
       this.moodBar.setFillStyle(0xf56565);
     }
 
-    const energy = Math.round(agent.state.energy);
+    const energy = Math.round(agent.aiState.energy);
     this.energyBar.width = (energy / 100) * 150;
     this.energyText.setText(`${energy}`);
     if (energy > 60) {
@@ -152,7 +152,7 @@ export class AgentPanel {
       moving: '🚶 Moving',
       idle: '⏸️ Idle',
     };
-    this.activityText.setText(activityLabels[agent.state.activity] || agent.state.activity);
+    this.activityText.setText(activityLabels[agent.aiState.activity] || agent.aiState.activity);
 
     const zoneLabels: Record<string, string> = {
       reception: 'Reception',
@@ -166,7 +166,7 @@ export class AgentPanel {
       wc_f: 'WC Women',
       corridor: 'Corridor',
     };
-    this.locationText.setText(`📍 ${zoneLabels[agent.state.location] || agent.state.location}`);
+    this.locationText.setText(`📍 ${zoneLabels[agent.aiState.location] || agent.aiState.location}`);
 
     this.thoughtsText.setText('💭 "Надо доделать API"');
 

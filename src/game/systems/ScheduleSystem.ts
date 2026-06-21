@@ -1,4 +1,4 @@
-import { AgentProfile, ScheduleEntry } from '../../data/agents';
+import { AgentProfile, ScheduleEntry } from '../../types/agent';
 
 interface ScheduleResult {
   activity: string;
@@ -35,12 +35,12 @@ export class ScheduleSystem {
   }
 
   private selectZone(entry: ScheduleEntry, gameHour: number): string {
-    if (entry.preferredZones.length === 0) {
+    if (entry.zones.length === 0) {
       return 'corridor';
     }
 
-    const index = Math.floor(gameHour) % entry.preferredZones.length;
-    return entry.preferredZones[index];
+    const index = Math.floor(gameHour) % entry.zones.length;
+    return entry.zones[index];
   }
 
   shouldChangeActivity(

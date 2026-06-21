@@ -14,7 +14,7 @@ export class LLMTriggerSystem {
     if (tick - lastTick < this.MIN_TICKS_BETWEEN_TRIGGERS) return null;
 
     const othersHere = otherAgents.filter(
-      a => a.state.location === agent.state.location && a.id !== agent.id
+      a => a.aiState.location === agent.aiState.location && a.id !== agent.id
     );
     if (othersHere.length > 0 && Math.random() < 0.3) {
       this.lastTriggerTime.set(agent.id, tick);
@@ -27,9 +27,9 @@ export class LLMTriggerSystem {
       return { type: 'activity_change', data: { activity: actChange } };
     }
 
-    if (agent.state.energy < 20 || agent.state.mood < 20) {
+    if (agent.aiState.energy < 20 || agent.aiState.mood < 20) {
       this.lastTriggerTime.set(agent.id, tick);
-      return { type: 'crisis', data: { energy: agent.state.energy, mood: agent.state.mood } };
+      return { type: 'crisis', data: { energy: agent.aiState.energy, mood: agent.aiState.mood } };
     }
 
     if (gameHour === 18 && gameMinute === 0) {

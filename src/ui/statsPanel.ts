@@ -60,10 +60,10 @@ export class StatsPanel {
   update(agents: Agent[]): void {
     if (agents.length === 0) return;
 
-    const avgMood = agents.reduce((s, a) => s + a.state.mood, 0) / agents.length;
-    const avgEnergy = agents.reduce((s, a) => s + a.state.energy, 0) / agents.length;
+    const avgMood = agents.reduce((s, a) => s + a.aiState.mood, 0) / agents.length;
+    const avgEnergy = agents.reduce((s, a) => s + a.aiState.energy, 0) / agents.length;
     const busyCount = agents.filter(a =>
-      a.state.activity === 'work' || a.state.activity === 'meeting'
+      a.aiState.activity === 'work' || a.aiState.activity === 'meeting'
     ).length;
 
     this.avgMoodText.setText(`😊 Настроение: ${Math.round(avgMood)}%`);
