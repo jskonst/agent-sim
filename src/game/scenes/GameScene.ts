@@ -3,6 +3,8 @@ import { HUD } from '../../ui/hud';
 import { AgentPanel } from '../../ui/agentPanel';
 import { EventLog } from '../../ui/eventLog';
 import { StatsPanel } from '../../ui/statsPanel';
+import { TokenPanel } from '../../ui/tokenPanel';
+import { SettingsPanel } from '../../ui/settingsPanel';
 import { Agent } from '../entities/Agent';
 import { MEDIEVAL_AGENTS } from '../../data/medieval_agents';
 import { MODERN_AGENTS } from '../../data/modern_agents';
@@ -72,6 +74,8 @@ export class GameScene extends Phaser.Scene {
   private agentPanel!: AgentPanel;
   private eventLog!: EventLog;
   private statsPanel!: StatsPanel;
+  private tokenPanel!: TokenPanel;
+  private settingsPanel!: SettingsPanel;
   private currentZone: string = 'town_hall';
   private zoneTexts: Phaser.GameObjects.Text[] = [];
   private agents: Agent[] = [];
@@ -119,6 +123,9 @@ export class GameScene extends Phaser.Scene {
     this.agentPanel = new AgentPanel(this);
     this.eventLog = new EventLog(this);
     this.statsPanel = new StatsPanel(this);
+    this.tokenPanel = new TokenPanel(this);
+    this.settingsPanel = new SettingsPanel();
+    this.settingsPanel.applySaved();
     this.setupInput();
     this.physics.add.collider(this.player, this.walls);
 
@@ -344,6 +351,22 @@ export class GameScene extends Phaser.Scene {
       this.observedAgentIndex = -1;
       this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
       this.agentPanel.hide();
+    });
+
+    this.input.keyboard!.on('keydown-T', () => {
+      this.tokenPanel.toggle();
+    });
+
+    this.input.keyboard!.on('keydown-S', () => {
+      if (this.settingsPanel.isVisible()) {
+        this.settingsPanel.hide();
+        this.scene.resume();
+      } else {
+        this.scene.pause();
+        this.settingsPanel.show(() => {
+          this.scene.resume();
+        });
+      }
     });
   }
 
