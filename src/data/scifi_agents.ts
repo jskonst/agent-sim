@@ -13,10 +13,10 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 8
     },
     schedule: [
-      { startHour: 7, endHour: 12, activity: 'work', preferredZones: ['command_center'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 13, endHour: 17, activity: 'work', preferredZones: ['command_center'] },
-      { startHour: 17, endHour: 19, activity: 'socialize', preferredZones: ['bar', 'living_quarters_1'] }
+      { startHour: 7, endHour: 12, activity: 'work', zones: ['command_center'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['bar'] },
+      { startHour: 13, endHour: 17, activity: 'work', zones: ['command_center'] },
+      { startHour: 17, endHour: 19, activity: 'socialize', zones: ['bar', 'living_quarters_1'] }
     ],
     relationships: {
       'doctor': 30,
@@ -37,11 +37,11 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 9
     },
     schedule: [
-      { startHour: 7, endHour: 11, activity: 'work', preferredZones: ['medbay'] },
-      { startHour: 11, endHour: 12, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 12, endHour: 16, activity: 'work', preferredZones: ['medbay'] },
-      { startHour: 16, endHour: 17, activity: 'rest', preferredZones: ['living_quarters_1'] },
-      { startHour: 17, endHour: 20, activity: 'work', preferredZones: ['medbay'] }
+      { startHour: 7, endHour: 11, activity: 'work', zones: ['medbay'] },
+      { startHour: 11, endHour: 12, activity: 'eat', zones: ['bar'] },
+      { startHour: 12, endHour: 16, activity: 'work', zones: ['medbay'] },
+      { startHour: 16, endHour: 17, activity: 'rest', zones: ['living_quarters_1'] },
+      { startHour: 17, endHour: 20, activity: 'work', zones: ['medbay'] }
     ],
     relationships: {
       'commander': 30,
@@ -62,10 +62,10 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 6
     },
     schedule: [
-      { startHour: 10, endHour: 12, activity: 'socialize', preferredZones: ['corridors'] },
-      { startHour: 12, endHour: 14, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 14, endHour: 17, activity: 'work', preferredZones: ['bar'] },
-      { startHour: 17, endHour: 21, activity: 'work', preferredZones: ['bar'] }
+      { startHour: 10, endHour: 12, activity: 'socialize', zones: ['corridors'] },
+      { startHour: 12, endHour: 14, activity: 'eat', zones: ['bar'] },
+      { startHour: 14, endHour: 17, activity: 'work', zones: ['bar'] },
+      { startHour: 17, endHour: 21, activity: 'work', zones: ['bar'] }
     ],
     relationships: {
       'commander': 35,
@@ -86,10 +86,10 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 6
     },
     schedule: [
-      { startHour: 7, endHour: 12, activity: 'work', preferredZones: ['cargo_dock'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 13, endHour: 17, activity: 'work', preferredZones: ['cargo_dock'] },
-      { startHour: 17, endHour: 18, activity: 'rest', preferredZones: ['living_quarters_1'] }
+      { startHour: 7, endHour: 12, activity: 'work', zones: ['cargo_dock'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['bar'] },
+      { startHour: 13, endHour: 17, activity: 'work', zones: ['cargo_dock'] },
+      { startHour: 17, endHour: 18, activity: 'rest', zones: ['living_quarters_1'] }
     ],
     relationships: {
       'engineer': 40,
@@ -110,10 +110,10 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 7
     },
     schedule: [
-      { startHour: 7, endHour: 12, activity: 'work', preferredZones: ['research_lab'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 13, endHour: 17, activity: 'work', preferredZones: ['research_lab'] },
-      { startHour: 17, endHour: 19, activity: 'rest', preferredZones: ['living_quarters_1'] }
+      { startHour: 7, endHour: 12, activity: 'work', zones: ['research_lab'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['bar'] },
+      { startHour: 13, endHour: 17, activity: 'work', zones: ['research_lab'] },
+      { startHour: 17, endHour: 19, activity: 'rest', zones: ['living_quarters_1'] }
     ],
     relationships: {
       'engineer': 30,
@@ -134,10 +134,10 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 7
     },
     schedule: [
-      { startHour: 7, endHour: 12, activity: 'work', preferredZones: ['hangar'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 13, endHour: 17, activity: 'work', preferredZones: ['hangar'] },
-      { startHour: 17, endHour: 19, activity: 'rest', preferredZones: ['living_quarters_1'] }
+      { startHour: 7, endHour: 12, activity: 'work', zones: ['hangar'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['bar'] },
+      { startHour: 13, endHour: 17, activity: 'work', zones: ['hangar'] },
+      { startHour: 17, endHour: 19, activity: 'rest', zones: ['living_quarters_1'] }
     ],
     relationships: {
       'cargo_worker': 40,
@@ -158,10 +158,10 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 7
     },
     schedule: [
-      { startHour: 9, endHour: 12, activity: 'work', preferredZones: ['command_center'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 13, endHour: 16, activity: 'work', preferredZones: ['command_center'] },
-      { startHour: 16, endHour: 18, activity: 'socialize', preferredZones: ['bar', 'living_quarters_1'] }
+      { startHour: 9, endHour: 12, activity: 'work', zones: ['command_center'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['bar'] },
+      { startHour: 13, endHour: 16, activity: 'work', zones: ['command_center'] },
+      { startHour: 16, endHour: 18, activity: 'socialize', zones: ['bar', 'living_quarters_1'] }
     ],
     relationships: {
       'commander': 40,
@@ -182,12 +182,12 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 6
     },
     schedule: [
-      { startHour: 8, endHour: 10, activity: 'socialize', preferredZones: ['corridors'] },
-      { startHour: 10, endHour: 12, activity: 'socialize', preferredZones: ['bar'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 13, endHour: 15, activity: 'rest', preferredZones: ['living_quarters_1'] },
-      { startHour: 15, endHour: 17, activity: 'socialize', preferredZones: ['corridors'] },
-      { startHour: 17, endHour: 19, activity: 'rest', preferredZones: ['living_quarters_1'] }
+      { startHour: 8, endHour: 10, activity: 'socialize', zones: ['corridors'] },
+      { startHour: 10, endHour: 12, activity: 'socialize', zones: ['bar'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['bar'] },
+      { startHour: 13, endHour: 15, activity: 'rest', zones: ['living_quarters_1'] },
+      { startHour: 15, endHour: 17, activity: 'socialize', zones: ['corridors'] },
+      { startHour: 17, endHour: 19, activity: 'rest', zones: ['living_quarters_1'] }
     ],
     relationships: {
       'doctor': 35,
@@ -208,10 +208,10 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 8
     },
     schedule: [
-      { startHour: 7, endHour: 11, activity: 'work', preferredZones: ['security_station'] },
-      { startHour: 11, endHour: 12, activity: 'eat', preferredZones: ['bar'] },
-      { startHour: 12, endHour: 16, activity: 'work', preferredZones: ['security_station'] },
-      { startHour: 16, endHour: 18, activity: 'patrol', preferredZones: ['corridors', 'hangar'] }
+      { startHour: 7, endHour: 11, activity: 'work', zones: ['security_station'] },
+      { startHour: 11, endHour: 12, activity: 'eat', zones: ['bar'] },
+      { startHour: 12, endHour: 16, activity: 'work', zones: ['security_station'] },
+      { startHour: 16, endHour: 18, activity: 'patrol', zones: ['corridors', 'hangar'] }
     ],
     relationships: {
       'commander': 45,
@@ -232,7 +232,7 @@ export const SCIFI_AGENTS: AgentProfile[] = [
       emotionalStability: 10
     },
     schedule: [
-      { startHour: 0, endHour: 24, activity: 'work', preferredZones: ['corridors'] }
+      { startHour: 0, endHour: 24, activity: 'work', zones: ['corridors'] }
     ],
     relationships: {
       'scientist': 40,

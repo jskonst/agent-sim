@@ -13,10 +13,10 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 7
     },
     schedule: [
-      { startHour: 9, endHour: 12, activity: 'work', preferredZones: ['city_hall'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 13, endHour: 17, activity: 'work', preferredZones: ['city_hall'] },
-      { startHour: 17, endHour: 19, activity: 'socialize', preferredZones: ['community_center'] }
+      { startHour: 9, endHour: 12, activity: 'work', zones: ['city_hall'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['cafe'] },
+      { startHour: 13, endHour: 17, activity: 'work', zones: ['city_hall'] },
+      { startHour: 17, endHour: 19, activity: 'socialize', zones: ['community_center'] }
     ],
     relationships: {
       'entrepreneur': 30,
@@ -37,10 +37,10 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 6
     },
     schedule: [
-      { startHour: 9, endHour: 13, activity: 'work', preferredZones: ['supermarket'] },
-      { startHour: 13, endHour: 14, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 14, endHour: 18, activity: 'work', preferredZones: ['supermarket'] },
-      { startHour: 18, endHour: 19, activity: 'rest', preferredZones: ['house_1'] }
+      { startHour: 9, endHour: 13, activity: 'work', zones: ['supermarket'] },
+      { startHour: 13, endHour: 14, activity: 'eat', zones: ['cafe'] },
+      { startHour: 14, endHour: 18, activity: 'work', zones: ['supermarket'] },
+      { startHour: 18, endHour: 19, activity: 'rest', zones: ['house_1'] }
     ],
     relationships: {
       'entrepreneur': 25,
@@ -61,11 +61,11 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 5
     },
     schedule: [
-      { startHour: 7, endHour: 11, activity: 'work', preferredZones: ['cafe'] },
-      { startHour: 11, endHour: 12, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 12, endHour: 16, activity: 'work', preferredZones: ['cafe'] },
-      { startHour: 16, endHour: 17, activity: 'rest', preferredZones: ['house_1'] },
-      { startHour: 17, endHour: 21, activity: 'work', preferredZones: ['cafe'] }
+      { startHour: 7, endHour: 11, activity: 'work', zones: ['cafe'] },
+      { startHour: 11, endHour: 12, activity: 'eat', zones: ['cafe'] },
+      { startHour: 12, endHour: 16, activity: 'work', zones: ['cafe'] },
+      { startHour: 16, endHour: 17, activity: 'rest', zones: ['house_1'] },
+      { startHour: 17, endHour: 21, activity: 'work', zones: ['cafe'] }
     ],
     relationships: {
       'entrepreneur': 40,
@@ -86,10 +86,10 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 7
     },
     schedule: [
-      { startHour: 8, endHour: 12, activity: 'work', preferredZones: ['auto_repair'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 13, endHour: 17, activity: 'work', preferredZones: ['auto_repair'] },
-      { startHour: 17, endHour: 18, activity: 'rest', preferredZones: ['house_1'] }
+      { startHour: 8, endHour: 12, activity: 'work', zones: ['auto_repair'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['cafe'] },
+      { startHour: 13, endHour: 17, activity: 'work', zones: ['auto_repair'] },
+      { startHour: 17, endHour: 18, activity: 'rest', zones: ['house_1'] }
     ],
     relationships: {
       'entrepreneur': 15,
@@ -110,10 +110,10 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 6
     },
     schedule: [
-      { startHour: 8, endHour: 12, activity: 'work', preferredZones: ['school'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 13, endHour: 17, activity: 'work', preferredZones: ['school'] },
-      { startHour: 17, endHour: 19, activity: 'rest', preferredZones: ['house_1'] }
+      { startHour: 8, endHour: 12, activity: 'work', zones: ['school'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['cafe'] },
+      { startHour: 13, endHour: 17, activity: 'work', zones: ['school'] },
+      { startHour: 17, endHour: 19, activity: 'rest', zones: ['house_1'] }
     ],
     relationships: {
       'mayor': 40,
@@ -134,13 +134,13 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 5
     },
     schedule: [
-      { startHour: 8, endHour: 9, activity: 'commute', preferredZones: ['bus_stop'] },
-      { startHour: 9, endHour: 12, activity: 'work', preferredZones: ['school'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 13, endHour: 15, activity: 'work', preferredZones: ['school'] },
-      { startHour: 15, endHour: 16, activity: 'socialize', preferredZones: ['park'] },
-      { startHour: 16, endHour: 17, activity: 'commute', preferredZones: ['bus_stop'] },
-      { startHour: 17, endHour: 19, activity: 'rest', preferredZones: ['house_1'] }
+      { startHour: 8, endHour: 9, activity: 'commute', zones: ['bus_stop'] },
+      { startHour: 9, endHour: 12, activity: 'work', zones: ['school'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['cafe'] },
+      { startHour: 13, endHour: 15, activity: 'work', zones: ['school'] },
+      { startHour: 15, endHour: 16, activity: 'socialize', zones: ['park'] },
+      { startHour: 16, endHour: 17, activity: 'commute', zones: ['bus_stop'] },
+      { startHour: 17, endHour: 19, activity: 'rest', zones: ['house_1'] }
     ],
     relationships: {
       'teacher': 50,
@@ -161,12 +161,12 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 8
     },
     schedule: [
-      { startHour: 9, endHour: 10, activity: 'rest', preferredZones: ['house_1'] },
-      { startHour: 10, endHour: 12, activity: 'socialize', preferredZones: ['park'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 13, endHour: 15, activity: 'socialize', preferredZones: ['community_center'] },
-      { startHour: 15, endHour: 17, activity: 'rest', preferredZones: ['house_1'] },
-      { startHour: 17, endHour: 19, activity: 'socialize', preferredZones: ['park'] }
+      { startHour: 9, endHour: 10, activity: 'rest', zones: ['house_1'] },
+      { startHour: 10, endHour: 12, activity: 'socialize', zones: ['park'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['cafe'] },
+      { startHour: 13, endHour: 15, activity: 'socialize', zones: ['community_center'] },
+      { startHour: 15, endHour: 17, activity: 'rest', zones: ['house_1'] },
+      { startHour: 17, endHour: 19, activity: 'socialize', zones: ['park'] }
     ],
     relationships: {
       'mayor': 20,
@@ -187,10 +187,10 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 6
     },
     schedule: [
-      { startHour: 8, endHour: 12, activity: 'work', preferredZones: ['cafe'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 13, endHour: 17, activity: 'work', preferredZones: ['community_center'] },
-      { startHour: 17, endHour: 19, activity: 'socialize', preferredZones: ['cafe'] }
+      { startHour: 8, endHour: 12, activity: 'work', zones: ['cafe'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['cafe'] },
+      { startHour: 13, endHour: 17, activity: 'work', zones: ['community_center'] },
+      { startHour: 17, endHour: 19, activity: 'socialize', zones: ['cafe'] }
     ],
     relationships: {
       'mayor': 30,
@@ -211,11 +211,11 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 6
     },
     schedule: [
-      { startHour: 7, endHour: 11, activity: 'work', preferredZones: ['bus_stop'] },
-      { startHour: 11, endHour: 12, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 12, endHour: 16, activity: 'work', preferredZones: ['bus_stop', 'park'] },
-      { startHour: 16, endHour: 17, activity: 'rest', preferredZones: ['house_1'] },
-      { startHour: 17, endHour: 20, activity: 'work', preferredZones: ['bus_stop'] }
+      { startHour: 7, endHour: 11, activity: 'work', zones: ['bus_stop'] },
+      { startHour: 11, endHour: 12, activity: 'eat', zones: ['cafe'] },
+      { startHour: 12, endHour: 16, activity: 'work', zones: ['bus_stop', 'park'] },
+      { startHour: 16, endHour: 17, activity: 'rest', zones: ['house_1'] },
+      { startHour: 17, endHour: 20, activity: 'work', zones: ['bus_stop'] }
     ],
     relationships: {
       'mechanic': 45,
@@ -236,13 +236,13 @@ export const MODERN_AGENTS: AgentProfile[] = [
       emotionalStability: 7
     },
     schedule: [
-      { startHour: 6, endHour: 8, activity: 'work', preferredZones: ['park'] },
-      { startHour: 8, endHour: 9, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 9, endHour: 12, activity: 'work', preferredZones: ['auto_repair'] },
-      { startHour: 12, endHour: 13, activity: 'eat', preferredZones: ['cafe'] },
-      { startHour: 13, endHour: 16, activity: 'work', preferredZones: ['auto_repair'] },
-      { startHour: 16, endHour: 17, activity: 'work', preferredZones: ['park'] },
-      { startHour: 17, endHour: 19, activity: 'rest', preferredZones: ['house_1'] }
+      { startHour: 6, endHour: 8, activity: 'work', zones: ['park'] },
+      { startHour: 8, endHour: 9, activity: 'eat', zones: ['cafe'] },
+      { startHour: 9, endHour: 12, activity: 'work', zones: ['auto_repair'] },
+      { startHour: 12, endHour: 13, activity: 'eat', zones: ['cafe'] },
+      { startHour: 13, endHour: 16, activity: 'work', zones: ['auto_repair'] },
+      { startHour: 16, endHour: 17, activity: 'work', zones: ['park'] },
+      { startHour: 17, endHour: 19, activity: 'rest', zones: ['house_1'] }
     ],
     relationships: {
       'student': 40,

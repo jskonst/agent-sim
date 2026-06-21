@@ -20,6 +20,7 @@ export class Agent extends Phaser.GameObjects.Container {
 
   path: Phaser.Math.Vector2[] = [];
   private moveProgress: number = 0;
+  private targetPosition: { x: number; y: number } | null = null;
 
   constructor(scene: Phaser.Scene, profile: AgentProfile, startZone: string) {
     super(scene, 0, 0);
@@ -38,8 +39,50 @@ export class Agent extends Phaser.GameObjects.Container {
       y: 0
     };
 
+    // Set initial position based on zone
+    const initialPos = this.getZonePosition(startZone);
+    this.setPosition(initialPos.x, initialPos.y);
+
     this.createSprite(scene);
     this.createLabel(scene);
+  }
+
+  private getZonePosition(zone: string): { x: number; y: number } {
+    // Default positions for zones (can be enhanced)
+    const positions: Record<string, { x: number; y: number }> = {
+      'town_hall': { x: 480, y: 480 },
+      'market': { x: 320, y: 640 },
+      'tavern': { x: 640, y: 320 },
+      'blacksmith': { x: 160, y: 480 },
+      'temple': { x: 800, y: 640 },
+      'farm': { x: 256, y: 800 },
+      'house_1': { x: 384, y: 256 },
+      'house_2': { x: 576, y: 256 },
+      'fountain': { x: 480, y: 384 },
+      'castle_gate': { x: 480, y: 896 },
+      'city_hall': { x: 480, y: 480 },
+      'supermarket': { x: 256, y: 640 },
+      'cafe': { x: 704, y: 384 },
+      'auto_repair': { x: 160, y: 576 },
+      'park': { x: 384, y: 800 },
+      'school': { x: 640, y: 704 },
+      'bus_stop': { x: 480, y: 160 },
+      'community_center': { x: 800, y: 480 },
+      'house_3': { x: 320, y: 320 },
+      'house_4': { x: 576, y: 320 },
+      'command_center': { x: 480, y: 480 },
+      'medbay': { x: 256, y: 640 },
+      'bar': { x: 704, y: 320 },
+      'cargo_dock': { x: 160, y: 576 },
+      'research_lab': { x: 800, y: 704 },
+      'living_quarters_1': { x: 320, y: 256 },
+      'living_quarters_2': { x: 640, y: 256 },
+      'corridors': { x: 480, y: 384 },
+      'hangar': { x: 480, y: 800 },
+      'security_station': { x: 800, y: 480 }
+    };
+
+    return positions[zone] || { x: 480, y: 480 };
   }
 
   private createSprite(scene: Phaser.Scene) {
@@ -75,26 +118,62 @@ export class Agent extends Phaser.GameObjects.Container {
   }
 
   update(gameHour: number, agents: Agent[]): void {
-    // TODO: Движение по пути
-    if (this.path.length > 0) {
-      this.moveAlongPath();
+    // Handle movement if target is set
+    if (this.targetPosition) {
+      this.moveToTarget();
     }
 
-    // TODO: Проверка расписания
+    // Check schedule and change activity if needed
     const activity = this.getActivityAtHour(gameHour);
     if (activity && activity.activity !== this.state.activity) {
-      this.changeActivity(activity.activity, activity.preferredZones[0]);
+      this.changeActivity(activity.activity, activity.zones[0]);
     }
 
-    // TODO: Обновление энергии и настроения
+    // Update stats
     this.updateStats();
+
+    // Handle interactions with nearby agents
+    this.handleAgentInteractions(agents);
   }
 
-  private moveAlongPath() {
-    // TODO: Плавное движение по тайлам
+  private moveToTarget() {
+    if (!this.targetPosition) return;
+
+    const dx = this.targetPosition.x - this.x;
+    const dy = this.targetPosition.y - this.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < 5) {
+      // Reached target
+      this.targetPosition = null;
+      return;
+    }
+
+    const speed = 2; // pixels per frame
+    const moveX = (dx / distance) * speed;
+    const moveY = (dy / distance) * speed;
+
+    this.x += moveX;
+    this.y += moveY;
   }
 
-  private getActivityAtHour(hour: number): { activity: string; zones: string[] } | null {
+  setTarget(x: number, y: number): void {
+    this.targetPosition = { x, y };
+  }
+
+  hasTarget(): boolean {
+    return this.targetPosition !== null;
+  }
+
+  getTarget(): { x: number; y: number } | null {
+    return this.targetPosition;
+  }
+
+  clearTarget(): void {
+    this.targetPosition = null;
+  }
+
+  private getActivityAtHour(hour: number): ScheduleEntry | null {
     return this.profile.schedule.find(
       s => hour >= s.startHour && hour < s.endHour
     ) || null;

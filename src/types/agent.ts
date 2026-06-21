@@ -18,6 +18,6 @@ export interface ScheduleEntry {
   startHour: number;
   endHour: number;
   activity: string;
-  preferredZones: string[];
+  zones: string[];
   requiredEnergy?: number;
 }

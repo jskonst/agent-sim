@@ -8,6 +8,9 @@ import { MEDIEVAL_AGENTS } from '../../data/medieval_agents';
 import { MODERN_AGENTS } from '../../data/modern_agents';
 import { SCIFI_AGENTS } from '../../data/scifi_agents';
 import { MovementSystem } from '../systems/MovementSystem';
+import { GameTime } from '../GameTime';
+import { AgentMovement } from '../AgentMovement';
+import { ScheduleEntry } from '../../types/agent';
 
 const TILE_SIZE = 32;
 
@@ -61,7 +64,7 @@ const SCIFI_ZONES: ZoneConfig[] = [
 ];
 
 export class GameScene extends Phaser.Scene {
-  private player!: Phaser.GameObjects.Rectangle;
+  private player!: Phaser.GameObjects.Rectangle & { body: Phaser.Physics.Arcade.Body };
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key };
   private walls!: Phaser.Physics.Arcade.StaticGroup;
@@ -81,6 +84,10 @@ export class GameScene extends Phaser.Scene {
   private scenario: string = 'medieval';
   private zones: ZoneConfig[] = [];
 
+  // Phase 2: Game systems
+  private gameTime!: GameTime;
+  private agentMovement!: AgentMovement;
+
   constructor() {
     super({ key: 'GameScene' });
   }
@@ -88,6 +95,10 @@ export class GameScene extends Phaser.Scene {
   create() {
     const selectedScenario = this.registry.get('selectedScenario') as any;
     const customConfig = this.registry.get('customConfig') as any;
+
+    // Initialize Phase 2 systems
+    this.gameTime = new GameTime(0.5); // 0.5 game minutes per real second
+    this.agentMovement = new AgentMovement(this, this.gameTime);
 
     if (customConfig) {
       this.scenario = 'custom';
@@ -115,8 +126,14 @@ export class GameScene extends Phaser.Scene {
     this.createAgents();
     this.hud.setAgents(this.agents);
 
+    // Add agents to movement system
+    this.agents.forEach(agent => {
+      this.agentMovement.addAgent(agent);
+    });
+
     window.addEventListener('beforeunload', () => {
-      this.agents.forEach(a => a.persistNow());
+      // Phase 3: Persistence
+      // this.agents.forEach(a => a.persistNow());
     });
 
     this.setupObservation();
@@ -210,10 +227,11 @@ export class GameScene extends Phaser.Scene {
 
     this.walls = this.physics.add.staticGroup();
 
-    this.walls.create(MAP_WIDTH / 2, 0, 400, 10).refreshBody();
-    this.walls.create(MAP_WIDTH / 2, MAP_HEIGHT, 400, 10).refreshBody();
-    this.walls.create(0, MAP_HEIGHT / 2, 10, 400).refreshBody();
-    this.walls.create(MAP_WIDTH, MAP_HEIGHT / 2, 10, 400).refreshBody();
+    // Create border walls
+    this.walls.create(MAP_WIDTH / 2, 0, MAP_WIDTH, 10).refreshBody();
+    this.walls.create(MAP_WIDTH / 2, MAP_HEIGHT, MAP_WIDTH, 10).refreshBody();
+    this.walls.create(0, MAP_HEIGHT / 2, 10, MAP_HEIGHT).refreshBody();
+    this.walls.create(MAP_WIDTH, MAP_HEIGHT / 2, 10, MAP_HEIGHT).refreshBody();
   }
 
   setupCamera() {
@@ -270,22 +288,21 @@ export class GameScene extends Phaser.Scene {
 
   handleMovement() {
     const speed = 200;
-    const velocity = this.physics.velocityFromRotation(0);
 
     if (this.cursors.left.isDown || this.wasd.A.isDown) {
-      this.player.setVelocityX(-speed);
+      this.player.body.setVelocityX(-speed);
     } else if (this.cursors.right.isDown || this.wasd.D.isDown) {
-      this.player.setVelocityX(speed);
+      this.player.body.setVelocityX(speed);
     } else {
-      this.player.setVelocityX(0);
+      this.player.body.setVelocityX(0);
     }
 
     if (this.cursors.up.isDown || this.wasd.W.isDown) {
-      this.player.setVelocityY(-speed);
+      this.player.body.setVelocityY(-speed);
     } else if (this.cursors.down.isDown || this.wasd.S.isDown) {
-      this.player.setVelocityY(speed);
+      this.player.body.setVelocityY(speed);
     } else {
-      this.player.setVelocityY(0);
+      this.player.body.setVelocityY(0);
     }
   }
 
@@ -326,7 +343,7 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard!.on('keydown-ESC', () => {
       this.observedAgentIndex = -1;
       this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-      this.agentPanel.clear();
+      this.agentPanel.hide();
     });
   }
 
@@ -338,11 +355,11 @@ export class GameScene extends Phaser.Scene {
     if (this.observedAgentIndex === this.agents.length) {
       this.observedAgentIndex = -1;
       this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-      this.agentPanel.clear();
+      this.agentPanel.hide();
     } else {
       const agent = this.agents[this.observedAgentIndex];
       this.cameras.main.startFollow(agent, true, 0.1, 0.1);
-      this.agentPanel.showAgent(agent);
+      this.agentPanel.show(agent);
     }
   }
 
@@ -356,25 +373,32 @@ export class GameScene extends Phaser.Scene {
         if (distance < 30) {
           this.observedAgentIndex = index;
           this.cameras.main.startFollow(agent, true, 0.1, 0.1);
-          this.agentPanel.showAgent(agent);
+          this.agentPanel.show(agent);
         }
       });
     });
   }
 
   update(time: number, delta: number) {
+    // Update game time
+    this.gameTime.update(delta / 1000); // Convert to seconds
+
+    // Update agent movement system
+    this.agentMovement.update(delta);
+
+    // Handle interactions
+    this.agentMovement.handleInteractions();
+
+    // Update player movement
     this.handleMovement();
     this.updateCurrentZone();
-    this.hud.update(this.currentZone, this.gameHour, this.gameMinute);
 
-    this.tickAccumulator += delta;
-    if (this.tickAccumulator >= this.TICK_INTERVAL) {
-      this.tickAccumulator -= this.TICK_INTERVAL;
-      this.advanceTime();
-    }
+    // Update HUD with current time
+    this.hud.update(this.currentZone, this.gameTime.getHours(), this.gameTime.getMinutes());
 
+    // Update individual agents
     this.agents.forEach((agent) => {
-      agent.update(this.gameHour, this.agents);
+      agent.update(this.gameTime.getHours(), this.agents);
     });
   }
 }
