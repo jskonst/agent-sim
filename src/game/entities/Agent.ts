@@ -217,8 +217,10 @@ export class Agent extends Phaser.GameObjects.Container {
 
   setPosition(x: number, y: number): this {
     super.setPosition(x, y);
-    this.aiState.x = x;
-    this.aiState.y = y;
+    if (this.aiState) {
+      this.aiState.x = x;
+      this.aiState.y = y;
+    }
     return this;
   }
 }

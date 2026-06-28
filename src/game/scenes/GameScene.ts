@@ -126,6 +126,17 @@ export class GameScene extends Phaser.Scene {
     this.tokenPanel = new TokenPanel(this);
     this.settingsPanel = new SettingsPanel();
     this.settingsPanel.applySaved();
+    this.hud.onSettingsClick = () => {
+      if (this.settingsPanel.isVisible()) {
+        this.settingsPanel.hide();
+        this.scene.resume();
+      } else {
+        this.scene.pause();
+        this.settingsPanel.show(() => {
+          this.scene.resume();
+        });
+      }
+    };
     this.setupInput();
     this.physics.add.collider(this.player, this.walls);
 
@@ -234,11 +245,19 @@ export class GameScene extends Phaser.Scene {
 
     this.walls = this.physics.add.staticGroup();
 
-    // Create border walls
-    this.walls.create(MAP_WIDTH / 2, 0, MAP_WIDTH as unknown as string, 10).refreshBody();
-    this.walls.create(MAP_WIDTH / 2, MAP_HEIGHT, MAP_WIDTH as unknown as string, 10).refreshBody();
-    this.walls.create(0, MAP_HEIGHT / 2, 10 as unknown as string, MAP_HEIGHT).refreshBody();
-    this.walls.create(MAP_WIDTH, MAP_HEIGHT / 2, 10 as unknown as string, MAP_HEIGHT).refreshBody();
+    const wallThickness = 10;
+    const wallConfigs = [
+      { x: MAP_WIDTH / 2, y: 0, w: MAP_WIDTH, h: wallThickness },
+      { x: MAP_WIDTH / 2, y: MAP_HEIGHT, w: MAP_WIDTH, h: wallThickness },
+      { x: 0, y: MAP_HEIGHT / 2, w: wallThickness, h: MAP_HEIGHT },
+      { x: MAP_WIDTH, y: MAP_HEIGHT / 2, w: wallThickness, h: MAP_HEIGHT },
+    ];
+
+    wallConfigs.forEach(w => {
+      const rect = this.add.rectangle(w.x, w.y, w.w, w.h, 0x000000, 0);
+      this.physics.add.existing(rect, true);
+      this.walls.add(rect);
+    });
   }
 
   setupCamera() {
@@ -279,7 +298,7 @@ export class GameScene extends Phaser.Scene {
 
     agentsData.forEach((profile, index) => {
       const firstActivity = profile.schedule[0];
-      const startZone = firstActivity?.preferredZones[0] || this.zones[0]?.id || 'town_hall';
+      const startZone = firstActivity?.zones?.[0] || this.zones[0]?.id || 'town_hall';
 
       const zone = this.zones.find(z => z.id === startZone);
       if (zone) {
@@ -357,17 +376,7 @@ export class GameScene extends Phaser.Scene {
       this.tokenPanel.toggle();
     });
 
-    this.input.keyboard!.on('keydown-S', () => {
-      if (this.settingsPanel.isVisible()) {
-        this.settingsPanel.hide();
-        this.scene.resume();
-      } else {
-        this.scene.pause();
-        this.settingsPanel.show(() => {
-          this.scene.resume();
-        });
-      }
-    });
+
   }
 
   nextAgent() {

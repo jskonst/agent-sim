@@ -87,10 +87,10 @@ export class AgentMovement {
 
     // Find current activity from schedule
     const currentActivity = this.findCurrentActivity(agent.profile.schedule, currentTime);
+    const targetZone = currentActivity?.zones?.[0];
 
-    if (currentActivity && currentActivity.location !== agent.aiState.location) {
-      // Agent needs to move to new location
-      this.moveToLocation(agent, currentActivity.location);
+    if (currentActivity && targetZone && targetZone !== agent.aiState.location) {
+      this.moveToLocation(agent, targetZone);
     } else if (currentActivity) {
       // Agent is at correct location, perform activity
       agent.aiState.activity = currentActivity.activity;
@@ -105,8 +105,8 @@ export class AgentMovement {
    */
   private findCurrentActivity(schedule: any[], currentTime: number): any | null {
     for (const activity of schedule) {
-      const startTime = activity.startHour * 60 + activity.startMinute;
-      const endTime = activity.endHour * 60 + activity.endMinute;
+      const startTime = activity.startHour * 60;
+      const endTime = activity.endHour * 60;
 
       if (currentTime >= startTime && currentTime < endTime) {
         return activity;

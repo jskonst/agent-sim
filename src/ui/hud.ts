@@ -13,6 +13,8 @@ export class HUD {
   private scenarioText: Phaser.GameObjects.Text;
   private exportButton: Phaser.GameObjects.Text;
   private profilesButton: Phaser.GameObjects.Text;
+  private settingsButton: Phaser.GameObjects.Text;
+  onSettingsClick: (() => void) | null = null;
   private agents: Agent[] = [];
   private gameHour: number = 8;
   private gameMinute: number = 30;
@@ -68,6 +70,17 @@ export class HUD {
 
     this.profilesButton.on('pointerdown', () => {
       this.exportProfiles();
+    });
+
+    this.settingsButton = scene.add.text(16, 204, '⚙ Настройки', {
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#4ecdc488',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(100).setInteractive();
+
+    this.settingsButton.on('pointerdown', () => {
+      this.onSettingsClick?.();
     });
   }
 
