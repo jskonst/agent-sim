@@ -97,6 +97,15 @@ export class SettingsPanel {
       apiKey: '',
     };
 
+    const presetsHtml = `
+    <div style="display:flex;gap:4px;margin:6px 0 8px;flex-wrap:wrap">
+      <button data-preset="openrouter" style="background:#4ecdc4;color:#000;border:none;padding:4px 8px;border-radius:3px;cursor:pointer;font-size:11px;font-family:monospace">OpenRouter</button>
+      <button data-preset="ollama" style="background:#ecc94b;color:#000;border:none;padding:4px 8px;border-radius:3px;cursor:pointer;font-size:11px;font-family:monospace">Ollama</button>
+      <button data-preset="zai" style="background:#9b59b6;color:#fff;border:none;padding:4px 8px;border-radius:3px;cursor:pointer;font-size:11px;font-family:monospace">z.ai (GLM)</button>
+      <button data-preset="openai" style="background:#2ecc71;color:#000;border:none;padding:4px 8px;border-radius:3px;cursor:pointer;font-size:11px;font-family:monospace">OpenAI</button>
+    </div>
+    `;
+
     const toolsetNames = Object.keys(config.toolsets);
     const priorityNames = Object.keys(config.priorities) as Array<keyof typeof config.priorities>;
 
@@ -117,6 +126,7 @@ export class SettingsPanel {
       </div>
 
       ${sectionHeader('LLM')}
+      ${presetsHtml}
       ${textInput('Model', llm.model)}
       ${numInput('Max Tokens/Req', llm.maxTokens, 50, 1, 4096)}
       ${numInput('Temperature', llm.temperature, 0.1, 0, 2)}
@@ -168,6 +178,25 @@ export class SettingsPanel {
     container.innerHTML = html;
     document.body.appendChild(container);
     this.overlay = container.firstElementChild as HTMLDivElement;
+
+    const presets = [
+      { key: 'openrouter', model: 'google/gemini-flash-1.5', url: 'https://openrouter.ai/api/v1/chat/completions' },
+      { key: 'ollama', model: 'llama3.2', url: 'http://localhost:11434/v1/chat/completions' },
+      { key: 'zai', model: 'glm-4.5', url: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      { key: 'openai', model: 'gpt-4o-mini', url: 'https://api.openai.com/v1/chat/completions' },
+    ];
+
+    presets.forEach(p => {
+      const btn = this.overlay!.querySelector(`button[data-preset="${p.key}"]`);
+      if (btn) {
+        btn.addEventListener('click', () => {
+          const modelInput = document.getElementById('s_Model') as HTMLInputElement;
+          const urlInput = document.getElementById('s_Base_URL') as HTMLInputElement;
+          if (modelInput) modelInput.value = p.model;
+          if (urlInput) urlInput.value = p.url;
+        });
+      }
+    });
 
     this.overlay.querySelector('#settingsClose')!.addEventListener('click', () => this.close());
     this.overlay.querySelector('#settingsCloseBtn')!.addEventListener('click', () => this.close());

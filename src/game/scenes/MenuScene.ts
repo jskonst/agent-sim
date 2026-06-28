@@ -1,5 +1,7 @@
 import { Scene } from 'phaser';
 import { SCENARIOS, ScenarioConfig } from '../config/scenarios';
+import { SettingsPanel } from '../../ui/settingsPanel';
+import { llmClient } from '../../ai/llmClient';
 
 export class MenuScene extends Scene {
   constructor() {
@@ -64,6 +66,35 @@ export class MenuScene extends Scene {
       .on('pointerdown', () => {
         this.loadConfig();
       });
+
+    const settingsBtn = this.add.text(centerX, 620, '⚙ Настройки LLM', {
+      fontSize: '18px',
+      color: '#ffffff',
+      backgroundColor: '#4ecdc4',
+      padding: { x: 20, y: 10 }
+    }).setOrigin(0.5);
+
+    settingsBtn.setInteractive()
+      .on('pointerdown', () => {
+        const panel = new SettingsPanel();
+        panel.applySaved();
+        panel.show();
+      })
+      .on('pointerover', () => {
+        settingsBtn.setBackgroundColor('#3eb5ac');
+      })
+      .on('pointerout', () => {
+        settingsBtn.setBackgroundColor('#4ecdc4');
+      });
+
+    const hasKey = llmClient.hasApiKey();
+    const keyStatus = this.add.text(centerX, 670, 
+      hasKey ? '🔑 API ключ настроен' : '⚠ API ключ не задан — LLM выключен', 
+      {
+        fontSize: '14px',
+        color: hasKey ? '#48bb78' : '#ecc94b',
+      }
+    ).setOrigin(0.5);
   }
 
   startGame(scenario: ScenarioConfig) {
